@@ -108,5 +108,49 @@ You can learn more about this example application and rest of the Spring Boot ru
 NOTE: Run the set of integration tests included with this example application using `mvn clean verify -Popenshift,openshift-it`.
 
 
-
 mvn clean spring-boot:run -Dspring-boot.run.profiles=local -Plocal
+
+SERVICE_DB_USER=luke SERVICE_DB_PASSWORD=secret SERVICE_DB_NAME=my_data SERVICE_DB_HOST=my-database \
+  mvn clean spring-boot:run -Dspring-boot.run.profiles=openshift -Popenshift
+
+
+# Oracle
+
+
+oc project
+
+oc adm policy add-scc-to-user privileged -z default 
+oc adm policy add-scc-to-user anyuid -z default 
+
+# Read email
+echo -n Reg. Email: 
+read email
+
+# Read Password
+echo -n Reg. Password: 
+read -s password
+
+oc create secret docker-registry oracle-registry \
+    --docker-server=container-registry.oracle.com \
+    --docker-username=${email} \
+    --docker-password=${password} \
+    --docker-email=${email}
+
+kubectl apply -f ./k8s/oracle-db.yaml
+
+oc rsh $(kubectl get pods -o json | jq -r '.items[] | select(.metadata.name | test("oracle19c-")).metadata.name')
+
+sqlplus system/Kube#2020@localhost:1521/${ORACLE_PDB}
+
+create user luke identified by "secret";
+
+grant CREATE SESSION, ALTER SESSION, CREATE DATABASE LINK, -
+  CREATE MATERIALIZED VIEW, CREATE PROCEDURE, CREATE PUBLIC SYNONYM, -
+  CREATE ROLE, CREATE SEQUENCE, CREATE SYNONYM, CREATE TABLE, - 
+  CREATE TRIGGER, CREATE TYPE, CREATE VIEW, UNLIMITED TABLESPACE -
+  to luke;
+
+SERVICE_DB_USER=luke SERVICE_DB_PASSWORD=secret SERVICE_DB_NAME=my_data SERVICE_DB_HOST=localhost \
+  mvn clean spring-boot:run -Dspring-boot.run.profiles=openshift-orcl -Popenshift-orcl
+
+

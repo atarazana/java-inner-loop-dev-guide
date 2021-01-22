@@ -12,16 +12,26 @@ spec:
     spec:
       containers:
         - env:
-            - name: DEPLOYMENTCONFIG_POSTGRESQL_USER
+            - name: SERVICE_DB_USER
               valueFrom:
                 secretKeyRef:
-                   name: my-database-secret
-                   key: user
-            - name: DEPLOYMENTCONFIG_POSTGRESQL_PASSWORD
+                   name: my-database
+                   key: DB_USER
+            - name: SERVICE_DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: my-database-secret
-                  key: password
+                  name: my-database
+                  key: DB_PASSWORD
+            - name: SERVICE_DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: my-database
+                  key: DB_NAME
+            - name: SERVICE_DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: my-database
+                  key: DB_HOST
             - name: JAVA_OPTIONS
               valueFrom:
                 configMapKeyRef:

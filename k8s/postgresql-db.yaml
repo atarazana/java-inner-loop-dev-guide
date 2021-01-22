@@ -3,9 +3,9 @@ apiVersion: v1
 kind: Secret
 metadata:
   annotations:
-    template.openshift.io/expose-POSTGRESQL_USER: '{.data[''POSTGRESQL_USER'']}'
-    template.openshift.io/expose-POSTGRESQL_PASSWORD: '{.data[''POSTGRESQL_PASSWORD'']}'
-    template.openshift.io/expose-POSTGRESQL_DATABASE: '{.data[''POSTGRESQL_DATABASE'']}'
+    template.openshift.io/expose-DB_USER: '{.data[''DB_USER'']}'
+    template.openshift.io/expose-DB_PASSWORD: '{.data[''DB_PASSWORD'']}'
+    template.openshift.io/expose-DB_NAME: '{.data[''DB_NAME'']}'
     #service.binding/POSTGRESQL_USER: 'path={.data.POSTGRESQL_USER}' 
     #service.binding/POSTGRESQL_PASSWORD: 'path={.data.POSTGRESQL_PASSWORD}' #annotate here.
     #service.binding/POSTGRESQL_DATABASE: 'path={.data.POSTGRESQL_DATABASE}' #annotate here.
@@ -13,15 +13,17 @@ metadata:
     template: postgresql-persistent-template
   name: my-database
 stringData:
-  POSTGRESQL_USER: luke
-  POSTGRESQL_PASSWORD: secret
-  POSTGRESQL_DATABASE: my_data
+  DB_USER: luke
+  DB_PASSWORD: secret
+  DB_NAME: my_data
+  DB_HOST: my-database
 ---
 apiVersion: v1
 kind: Service
 metadata:
   annotations:
     template.openshift.io/expose-uri: postgres://{.spec.clusterIP}:{.spec.ports[?(.name=="postgresql")].port}
+    service.binding/DB_CREDS: 'path={.spec.selector.name},objectType=Secret'
   labels:
     app: my-database
     template: postgresql-persistent-template
@@ -152,5 +154,22 @@ spec:
     - group: apps.openshift.io
       version: v1
       kind: DeploymentConfig
+      name: my-database
+      id: database
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: ServiceBinding
+metadata:
+  name: backend-servicebinding
+spec:
+  application:
+    group: apps
+    resource: deployments
+    name: backend
+    version: v1
+  services:
+    - group: ""
+      version: v1
+      kind: Service
       name: my-database
       id: database

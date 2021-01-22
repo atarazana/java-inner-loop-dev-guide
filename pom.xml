@@ -36,6 +36,7 @@
     <awaitility.version>3.1.0</awaitility.version>
     <openjdk18-openshift.version>latest</openjdk18-openshift.version>
     <postgresql.version>9.4.1212</postgresql.version>
+    <oracle.version>19.6.0.0</oracle.version>
     <rest-assured.version>3.1.0</rest-assured.version>
     <spring-boot.version>2.2.10.RELEASE</spring-boot.version>
     <jkube.generator.from>registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:${openjdk18-openshift.version}</jkube.generator.from>
@@ -70,6 +71,16 @@
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
         <version>${postgresql.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.oracle.database.jdbc</groupId>
+        <artifactId>ojdbc8</artifactId>
+        <version>${oracle.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.oracle.database.jdbc</groupId>
+        <artifactId>ucp</artifactId>
+        <version>${oracle.version}</version>
       </dependency>
       <dependency>
         <groupId>io.rest-assured</groupId>
@@ -279,6 +290,42 @@
       <activation/>
       <properties>
         <db.name>PostgreSQL</db.name>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.eclipse.jkube</groupId>
+            <artifactId>openshift-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>fmp</id>
+                <goals>
+                  <goal>resource</goal>
+                  <goal>build</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>openshift-orcl</id>
+      <dependencies>
+        <dependency>
+          <groupId>com.oracle.database.jdbc</groupId>
+          <artifactId>ojdbc8</artifactId>
+          <scope>runtime</scope>
+        </dependency>
+        <dependency>
+          <groupId>com.oracle.database.jdbc</groupId>
+          <artifactId>ucp</artifactId>
+          <scope>runtime</scope>
+        </dependency>
+      </dependencies>
+      <activation/>
+      <properties>
+        <db.name>Oracle</db.name>
       </properties>
       <build>
         <plugins>

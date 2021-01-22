@@ -1,3 +1,3 @@
-insert into fruit (name) values ('Cherry');
-insert into fruit (name) values ('Apple');
-insert into fruit (name) values ('Banana');
+insert into fruit (id, name) values (FRUIT_SEQ.NEXTVAL, 'Cherry');
+insert into fruit (id, name) values (FRUIT_SEQ.NEXTVAL, 'Apple');
+insert into fruit (id, name) values (FRUIT_SEQ.NEXTVAL, 'Banana');
