@@ -153,4 +153,7 @@ grant CREATE SESSION, ALTER SESSION, CREATE DATABASE LINK, -
 SERVICE_DB_USER=luke SERVICE_DB_PASSWORD=secret SERVICE_DB_NAME=my_data SERVICE_DB_HOST=localhost \
   mvn clean spring-boot:run -Dspring-boot.run.profiles=openshift-orcl -Popenshift-orcl
 
+SERVICE_DB_USER=luke SERVICE_DB_PASSWORD=secret SERVICE_DB_NAME=my_data SERVICE_DB_HOST=localhost \
+  mvn clean spring-boot:run -Dspring-boot.run.profiles=openshift-postgresql -Popenshift-postgresql
+
 

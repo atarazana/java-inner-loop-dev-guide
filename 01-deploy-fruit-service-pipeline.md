@@ -29,14 +29,15 @@ oc delete project ${TEST_PROJECT}
     PostgreSQL Database Name: my_data
     CLICK on Create
 3.4 Add -> From Git
-    Git Repo URL: https://github.com/cvicens/spring-boot-fruit-service
+    Git Repo URL: https://github.com/atarazana/spring-boot-fruit-service
     Java 8
     General Application: fruit-service-app 
     Name: fruit-service-git <===
     Check Deployment <===
     Click on Deployment to add env variables
-    - DB_USERNAME from secret my-database...
-    - DB_PASSWORD from secret my-database...
+    - SERVICE_DB_HOST: my-database
+    - SERVICE_DB_USER from secret my-database...
+    - SERVICE_DB_PASSWORD from secret my-database...
     - JAVA_OPTIONS: -Dspring.profiles.active=openshift
     Click on labels
     - app=fruit-service-git version=1.0.0
@@ -60,13 +61,13 @@ Details bellow in section **"DEPLOY JENKINS"** or do as follows:
    Disable memory intensive administrative monitors: true
    Allows use of Jenkins Update Center repository with invalid SSL certificate: true
 
-### DEPLOY WITH F8
+### DEPLOY WITH JKube
 
 > CHECK JAVA VERSION (it should be 8): java -version
 
 ```sh
 oc project ${DEV_PROJECT}
-mvn clean fabric8:deploy -DskipTests -Popenshift
+mvn clean oc:deploy -DskipTests -Popenshift
 oc label dc/fruit-service-dev app.kubernetes.io/part-of=fruit-service-app --overwrite=true -n ${DEV_PROJECT} && \
 oc label dc/fruit-service-dev app.openshift.io/runtime=spring --overwrite=true -n ${DEV_PROJECT} && \
 oc annotate dc/fruit-service-dev app.openshift.io/connects-to=my-database --overwrite=true -n ${DEV_PROJECT} 

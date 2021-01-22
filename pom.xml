@@ -276,10 +276,11 @@
       </dependencies>
       <properties>
         <db.name>H2</db.name>
+        <profile.name>local</profile.name>
       </properties>
     </profile>
     <profile>
-      <id>openshift</id>
+      <id>openshift-postgresql</id>
       <dependencies>
         <dependency>
           <groupId>org.postgresql</groupId>
@@ -290,6 +291,7 @@
       <activation/>
       <properties>
         <db.name>PostgreSQL</db.name>
+        <profile.name>openshift-postgresql</profile.name>
       </properties>
       <build>
         <plugins>
@@ -310,7 +312,7 @@
       </build>
     </profile>
     <profile>
-      <id>openshift-orcl</id>
+      <id>openshift-oracle</id>
       <dependencies>
         <dependency>
           <groupId>com.oracle.database.jdbc</groupId>
@@ -326,6 +328,7 @@
       <activation/>
       <properties>
         <db.name>Oracle</db.name>
+        <profile.name>openshift-oracle</profile.name>
       </properties>
       <build>
         <plugins>

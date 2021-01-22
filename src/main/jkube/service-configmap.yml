@@ -3,4 +3,4 @@ kind: ConfigMap
 metadata:
   name: fruit-service-configmap
 data:
-  java-options: "-Dspring.profiles.active=openshift"
+  java-options: "-Dspring.profiles.active=${profile.name}"
