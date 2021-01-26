@@ -11,12 +11,12 @@ metadata:
     #service.binding/POSTGRESQL_DATABASE: 'path={.data.POSTGRESQL_DATABASE}' #annotate here.
   labels:
     template: postgresql-persistent-template
-  name: my-database
+  name: postgresql-db
 stringData:
   DB_USER: luke
   DB_PASSWORD: secret
-  DB_NAME: my_data
-  DB_HOST: my-database
+  DB_NAME: FRUITSDB
+  DB_HOST: postgresql-db
 ---
 apiVersion: v1
 kind: Service
@@ -25,9 +25,9 @@ metadata:
     template.openshift.io/expose-uri: postgres://{.spec.clusterIP}:{.spec.ports[?(.name=="postgresql")].port}
     service.binding/DB_CREDS: 'path={.spec.selector.name},objectType=Secret'
   labels:
-    app: my-database
+    app: postgresql-db
     template: postgresql-persistent-template
-  name: my-database
+  name: postgresql-db
 spec:
   ports:
   - name: postgresql
@@ -36,7 +36,7 @@ spec:
     protocol: TCP
     targetPort: 5432
   selector:
-    name: my-database
+    name: postgresql-db
   sessionAffinity: None
   type: ClusterIP
 status:
@@ -46,14 +46,14 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   labels:
-    app: my-database
-    app.kubernetes.io/component: my-database
-    app.kubernetes.io/instance: my-database
+    app: postgresql-db
+    app.kubernetes.io/component:postgresql-db
+    app.kubernetes.io/instance: postgresql-db
     app.kubernetes.io/part-of: spring-boot-app
     #app.openshift.io/runtime: postgresql
     app.kubernetes.io/name: postgresql
     template: postgresql-persistent-template
-  name: my-database
+  name: postgresql-db
 spec:
   accessModes:
   - ReadWriteOnce
@@ -68,30 +68,30 @@ metadata:
     template.alpha.openshift.io/wait-for-ready: "true"
     service.binding/DB_CREDS: 'path={.spec.selector.name},objectType=Secret' 
   labels:
-    app: my-database
-    app.kubernetes.io/component: my-database
-    app.kubernetes.io/instance: my-database
+    app: postgresql-db
+    app.kubernetes.io/component: postgresql-db
+    app.kubernetes.io/instance: postgresql-db
     app.kubernetes.io/part-of: spring-boot-app
     #app.openshift.io/runtime: postgresql
     app.kubernetes.io/name: postgresql
     template: postgresql-persistent-template
-  name: my-database
+  name: postgresql-db
 spec:
   replicas: 1
   selector:
-    name: my-database
+    name: postgresql-db
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        name: my-database
+        name: postgresql-db
     spec:
       containers:
       - capabilities: {}
         envFrom:
         - secretRef:
-            name: my-database
+            name: postgresql-db
         image: ' '
         imagePullPolicy: IfNotPresent
         livenessProbe:
@@ -120,13 +120,13 @@ spec:
         terminationMessagePath: /dev/termination-log
         volumeMounts:
         - mountPath: /var/lib/pgsql/data
-          name: my-database-data
+          name: postgresql-db-data
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       volumes:
-      - name: my-database-data
+      - name: postgresql-db-data
         persistentVolumeClaim:
-          claimName: my-database
+          claimName: postgresql-db
   triggers:
   - imageChangeParams:
       automatic: true
@@ -154,7 +154,7 @@ spec:
     - group: apps.openshift.io
       version: v1
       kind: DeploymentConfig
-      name: my-database
+      name: postgresql-db
       id: database
 ---
 apiVersion: operators.coreos.com/v1alpha1
@@ -171,5 +171,5 @@ spec:
     - group: ""
       version: v1
       kind: Service
-      name: my-database
+      name: postgresql-db
       id: database

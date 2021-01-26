@@ -60,7 +60,7 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: oracle19c
+  name: oracle-db
   labels:
     app: database
     version: 19.3.0.1
@@ -72,7 +72,7 @@ spec:
       version: 19.3.0.1
   template:
     metadata:
-      name: oracle19c
+      name: oracle-db
       labels:
         app: database
         version: 19.3.0.1
@@ -93,7 +93,7 @@ spec:
            persistentVolumeClaim:
              claimName: ora-setup193
       containers:
-        - name: oracle19c
+        - name: oracle
           #image: registry:32000/oracledb:19.3.0-ee
           image: container-registry.oracle.com/database/enterprise:19.3.0.0
           command:
@@ -118,22 +118,26 @@ spec:
               mountPath: "/opt/oracle/scripts/setup"
             - name: ora-startup193
               mountPath: "/opt/oracle/scripts/startup"
-          readinessProbe:
-            initialDelaySeconds: 60
-            periodSeconds: 60
-            exec:
-              command:
-                - /bin/sh
-                - "-c"
-                - $ORACLE_BASE/$CHECK_DB_FILE
-          livenessProbe:
-            initialDelaySeconds: 300
-            periodSeconds: 60
-            exec:
-              command:
-                - /bin/sh
-                - "-c"
-                - $ORACLE_BASE/$CHECK_DB_FILE
+          #readinessProbe:
+          #  initialDelaySeconds: 60
+          #  periodSeconds: 60
+          #  exec:
+          #    command:
+          #      - /bin/sh
+          #      - "-c"
+          #      - $ORACLE_BASE/$CHECK_DB_FILE
+          #livenessProbe:
+          #  initialDelaySeconds: 30
+          #  periodSeconds: 60
+          #  exec:
+          #    command:
+          #      - /bin/sh
+          #      - "-c"
+          #      - $ORACLE_BASE/$CHECK_DB_FILE
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh","-c","@echo shutdown immediate | sqlplus / as sysdba"]
           env:
             - name: ORACLE_SID
               valueFrom:
@@ -158,10 +162,11 @@ spec:
       imagePullSecrets:
         - name: oracle-registry
 ---
+# Headless Service, returns the IPs of the PODs directly, not a virtual IP
 apiVersion: v1
 kind: Service
 metadata:
-  name: oracle19c
+  name: oracle-db
   labels:
     app: database
     version: 19.3.0.1
@@ -169,7 +174,8 @@ spec:
   selector:
     app: database
     version: 19.3.0.1
-  type: NodePort
+  type: ClusterIP
+  clusterIP: None
   ports:
   - name: listener
     protocol: TCP

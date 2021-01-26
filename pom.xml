@@ -21,8 +21,8 @@
     <artifactId>snowdrop-dependencies</artifactId>
     <version>2.2.10.Final</version>
   </parent>
-  <groupId>com.yourcompany.newapp</groupId>
-  <artifactId>fruit-service-dev</artifactId>
+  <groupId>dev.snowdrop.example</groupId>
+  <artifactId>fruit-service</artifactId>
   <version>1.0.0</version>
   <name>Spring Boot - CRUD Example</name>
   <description>Spring Boot - CRUD Example</description>
@@ -276,6 +276,7 @@
       </dependencies>
       <properties>
         <db.name>H2</db.name>
+        <db.type>h2</db.type>
         <profile.name>local</profile.name>
       </properties>
     </profile>
@@ -290,7 +291,8 @@
       </dependencies>
       <activation/>
       <properties>
-        <db.name>PostgreSQL</db.name>
+        <db.name>FRUITSDB</db.name>
+        <db.type>postgresql</db.type>
         <profile.name>openshift-postgresql</profile.name>
       </properties>
       <build>
@@ -327,7 +329,8 @@
       </dependencies>
       <activation/>
       <properties>
-        <db.name>Oracle</db.name>
+        <db.name>ORCLPDB1</db.name>
+        <db.type>oracle</db.type>
         <profile.name>openshift-oracle</profile.name>
       </properties>
       <build>

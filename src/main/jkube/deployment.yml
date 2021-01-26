@@ -3,7 +3,7 @@ apiVersion: apps/v1
 metadata:
   name: ${project.artifactId}
   annotations:
-    app.openshift.io/connects-to: my-database
+    app.openshift.io/connects-to: ${db.type}-db
   labels:
     app.kubernetes.io/part-of: fruit-service-app
     app.openshift.io/runtime: spring
@@ -15,25 +15,25 @@ spec:
             - name: SERVICE_DB_USER
               valueFrom:
                 secretKeyRef:
-                   name: my-database
+                   name: ${project.artifactId}-${db.type}-db
                    key: DB_USER
             - name: SERVICE_DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: my-database
+                  name: ${project.artifactId}-${db.type}-db
                   key: DB_PASSWORD
             - name: SERVICE_DB_NAME
               valueFrom:
                 secretKeyRef:
-                  name: my-database
+                  name: ${project.artifactId}-${db.type}-db
                   key: DB_NAME
             - name: SERVICE_DB_HOST
               valueFrom:
                 secretKeyRef:
-                  name: my-database
+                  name: ${project.artifactId}-${db.type}-db
                   key: DB_HOST
             - name: JAVA_OPTIONS
               valueFrom:
                 configMapKeyRef:
-                  name: fruit-service-configmap
+                  name: ${project.artifactId}-${db.type}-configmap
                   key: java-options

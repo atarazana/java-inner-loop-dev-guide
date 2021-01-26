@@ -12,3 +12,6 @@ bin
 tmp
 
 old/
+
+# Other
+.DS_Store
