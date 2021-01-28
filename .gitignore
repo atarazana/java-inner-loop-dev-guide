@@ -19,6 +19,8 @@ old/
 # Other
 .DS_Store
 node_modules
+*.log
+*-lock.json
 
 # Build
 gh-pages
