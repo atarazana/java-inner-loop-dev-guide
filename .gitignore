@@ -13,5 +13,14 @@ tmp
 
 old/
 
+# VS Code
+.vscode
+
 # Other
 .DS_Store
+node_modules
+
+# Build
+gh-pages
+build
+.cache

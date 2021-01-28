@@ -1,0 +1,40 @@
+= Welcome to Spring Boot CRUD on OpenShift Tutorial
+include::_attributes.adoc[]
+:page-layout: home
+:!sectids:
+
+[.text-center.strong]
+== Accelerate the development of Spring Boot CRUD Apps on OpenShift
+
+Learn cloud native aware Inner-loop Development Techniques to accelerate the development of Spring Boot CRUD applications for OpenShift.
+
+This tutorial provides you with a super-simple CRUD microservice, *`FruitService`*, that implements the usual functions: create, update, delete, find all, etc. mapped to a table in a releational database.
+
+No need to code this time, the Java code is simple it works and we have tested it against, H2, PostgreSQL and Oracle RDBMS.
+
+So what will you do in this tutorial? Simple, you're going to:
+
+* Deploy the code against PostgreSQL directly from the command line using the link:https://www.eclipse.org/jkube:[JKube] maven plugin
+* You will learn how JKube leverages Source to Image (link:https://docs.openshift.com/container-platform/{oc-version}/builds/understanding-image-builds.html#builds-strategy-s2i-build_understanding-image-builds[S2I]) to speed up the process of building OCI images inside OpenShift.
+* Finally we will show you how to use link:https://telepresence.io:[Telepresence] to speed up inner-loop development iterations.
+
+Optionally, although highly recommendable, you will do the same but this time against an Oracle database. You will learn how to use a Kubernetes `Service` of type `ExternalName` to point to the Oracle database as if it were not deployed in your cluster, hence external. 
+
+NOTE: No worries if you don't have an Oracle database at hand, we'll show you how you can have an Oracle database running in a container in your OpenShift cluster (for testing purposes and as long as you have an OTN developer account you can use to pull images from the Oracle Container Registry).
+
+[.tiles.browse]
+== Browse modules
+
+[.tile]
+xref:01-setup.adoc[Get Started]
+//* xref:01-setup.adoc#minikube[Minikube]
+
+[.tile]
+.xref:02a-deploy-postgresql.adoc[Spring Boot + PostgreSQL]
+* xref:02a-deploy-postgresql.adoc#package[Package the Application]
+* xref:02a-deploy-postgresql.adoc#deploy[Deploy the Application]
+
+[.tile]
+.xref:02b-deploy-oracle.adoc[Spring Boot + Oracle]
+* xref:02b-deploy-oracle.adoc#package[Package the Application]
+* xref:02b-deploy-oracle.adoc#deploy[Deploy the Application]

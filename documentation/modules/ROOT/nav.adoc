@@ -1,0 +1,16 @@
+* xref:01-setup.adoc[Setup]
+** xref:01-setup.adoc#prerequisite[Prerequisites]
+//** xref:01-setup.adoc#minikube[Setup Minikube]
+
+* xref:02a-deploy-postgresql.adoc[Spring Boot => PostgreSQL]
+** xref:02a-deploy-postgresql.adoc#the-code[The code]
+** xref:02a-deploy-postgresql.adoc#maven-profiles[Maven Profiles]
+** xref:02a-deploy-postgresql.adoc#run-local[Running the code locally against H2]
+** xref:02a-deploy-postgresql.adoc#deploy-database[Deploying PostgreSQL]
+** xref:02a-deploy-postgresql.adoc#deploy-code[Deploying the code]
+** xref:02a-deploy-postgresql.adoc#run-local-telepresence[Running locally against PostgreSQL with telepresence]
+
+
+* xref:02b-deploy-oracle.adoc[Deploy Service => Oracle]
+** xref:02b-deploy-oracle.adoc#package[Build Service]
+** xref:02b-deploy-oracle.adoc#deploy[Deploy Dervice]

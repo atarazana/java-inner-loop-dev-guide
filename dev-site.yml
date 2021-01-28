@@ -1,0 +1,29 @@
+runtime:
+  cache_dir: ./.cache/antora
+
+site:
+  title: Spring Boot CRUD Guide to OpenShift
+  url: http://localhost:3000/rhs-build-course/index.html
+  start_page: java-inner-loop-dev-tutorial::index.adoc
+
+content:
+  sources:
+    - url: .
+      branches: HEAD
+      start_path: documentation
+asciidoc:
+  attributes:
+    title: Spring Boot CRUD Guide to OpenShift
+    git_url: https://github.com/atarazana/spring-boot-fruit-service.git
+    git_ref: master
+    download_url: https://github.com/atarazana/spring-boot-fruit-service/archive/master.zip
+  extensions:
+    - ./lib/remote-include-processor.js
+    - ./lib/tab-block.js
+ui:
+  bundle:
+    url: https://github.com/redhat-scholars/course-ui/releases/download/v0.1.1/ui-bundle.zip
+    snapshot: true
+  supplemental_files: ./supplemental-ui
+output:
+  dir: ./gh-pages

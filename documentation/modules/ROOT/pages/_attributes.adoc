@@ -1,0 +1,4 @@
+include::versions.adoc[]
+:experimental:
+:source-highlighter: highlightjs
+:artifact_id: fruit-service

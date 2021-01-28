@@ -1,0 +1,7 @@
+name: java-inner-loop-dev-tutorial
+title: Java Inner-Loop Dev Guide
+version: master
+nav:
+  - modules/ROOT/nav.adoc
+
+start_page: ROOT:index.adoc
