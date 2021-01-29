@@ -23,10 +23,10 @@ oc delete project ${TEST_PROJECT}
 3. Add -> Database
 3.1 Uncheck Type->Operator Backed
 3.2 PostgreSQL (Non-ephemeral) then click on Instantiate Template
-3.3 Database Service Name: my-database
+3.3 Database Service Name: postgresql-db
     PostgreSQL Connection Username: luke
     PostgreSQL Connection Password: secret
-    PostgreSQL Database Name: my_data
+    PostgreSQL Database Name: FRUITSDB
     CLICK on Create
 3.4 Add -> From Git
     Git Repo URL: https://github.com/atarazana/spring-boot-fruit-service
@@ -35,10 +35,10 @@ oc delete project ${TEST_PROJECT}
     Name: fruit-service-git <===
     Check Deployment <===
     Click on Deployment to add env variables
-    - SERVICE_DB_HOST: my-database
-    - SERVICE_DB_USER from secret my-database...
-    - SERVICE_DB_PASSWORD from secret my-database...
-    - SERVICE_DB_NAME from secret my-database...
+    - SERVICE_DB_HOST: postgresql-db
+    - SERVICE_DB_USER from secret postgresql-db...
+    - SERVICE_DB_PASSWORD from secret postgresql-db...
+    - SERVICE_DB_NAME from secret postgresql-db...
     - JAVA_OPTIONS: -Dspring.profiles.active=openshift-postgresql
     Click on BuildConfig <=== We need to do this because we have two different openshift profiles for oracle and postgresql
     - MAVEN_ARGS: -Popenshift-postgresql
@@ -48,9 +48,9 @@ oc delete project ${TEST_PROJECT}
 ### DECORATE DATABASE AND GIT DEPLOYMENT
 
 oc label deployment/fruit-service-git app.openshift.io/runtime=spring --overwrite=true -n ${DEV_PROJECT} && \
-oc annotate deployment/fruit-service-git app.openshift.io/connects-to=my-database --overwrite=true -n ${DEV_PROJECT} && \
-oc label dc/my-database app.kubernetes.io/part-of=fruit-service-app --overwrite=true -n ${DEV_PROJECT} && \
-oc label dc/my-database app.openshift.io/runtime=postgresql --overwrite=true -n ${DEV_PROJECT}
+oc annotate deployment/fruit-service-git app.openshift.io/connects-to=postgresql-db --overwrite=true -n ${DEV_PROJECT} && \
+oc label dc/postgresql-db app.kubernetes.io/part-of=fruit-service-app --overwrite=true -n ${DEV_PROJECT} && \
+oc label dc/postgresql-db app.openshift.io/runtime=postgresql --overwrite=true -n ${DEV_PROJECT}
 
 ### DEPLOY JENKINS HERE TO SAVE TIME... 
 
@@ -73,7 +73,7 @@ oc project ${DEV_PROJECT}
 mvn clean oc:deploy -DskipTests -Popenshift-postgresql
 oc label dc/fruit-service-dev app.kubernetes.io/part-of=fruit-service-app --overwrite=true -n ${DEV_PROJECT} && \
 oc label dc/fruit-service-dev app.openshift.io/runtime=spring --overwrite=true -n ${DEV_PROJECT} && \
-oc annotate dc/fruit-service-dev app.openshift.io/connects-to=my-database --overwrite=true -n ${DEV_PROJECT} 
+oc annotate dc/fruit-service-dev app.openshift.io/connects-to=postgresql-db --overwrite=true -n ${DEV_PROJECT} 
 ```
 
 ## COMPLETE PIPELINE
@@ -99,17 +99,17 @@ oc label dc/jenkins app.openshift.io/runtime=jenkins --overwrite=true -n ${DEV_P
 Deploy DB in ${DEV_PROJECT}
 
 ```sh
-oc new-app -e POSTGRESQL_USER=luke -ePOSTGRESQL_PASSWORD=secret -ePOSTGRESQL_DATABASE=my_data centos/postgresql-10-centos7 --as-deployment-config=true --name=my-database -n ${DEV_PROJECT}
-oc label dc/my-database app.kubernetes.io/part-of=fruit-service-app -n ${DEV_PROJECT} && \
-oc label dc/my-database app.openshift.io/runtime=postgresql --overwrite=true -n ${DEV_PROJECT} 
+oc new-app -e POSTGRESQL_USER=luke -ePOSTGRESQL_PASSWORD=secret -ePOSTGRESQL_DATABASE=my_data centos/postgresql-10-centos7 --as-deployment-config=true --name=postgresql-db -n ${DEV_PROJECT}
+oc label dc/postgresql-db app.kubernetes.io/part-of=fruit-service-app -n ${DEV_PROJECT} && \
+oc label dc/postgresql-db app.openshift.io/runtime=postgresql --overwrite=true -n ${DEV_PROJECT} 
 ```
 
 Deploy DB in ${TEST_PROJECT}
 
 ```sh
-oc new-app -e POSTGRESQL_USER=luke -ePOSTGRESQL_PASSWORD=secret -ePOSTGRESQL_DATABASE=my_data centos/postgresql-10-centos7 --as-deployment-config=true --name=my-database -n ${TEST_PROJECT}
-oc label dc/my-database app.kubernetes.io/part-of=fruit-service-app -n ${TEST_PROJECT} && \
-oc label dc/my-database app.openshift.io/runtime=postgresql --overwrite=true -n ${TEST_PROJECT} 
+oc new-app -e POSTGRESQL_USER=luke -ePOSTGRESQL_PASSWORD=secret -ePOSTGRESQL_DATABASE=my_data centos/postgresql-10-centos7 --as-deployment-config=true --name=postgresql-db -n ${TEST_PROJECT}
+oc label dc/postgresql-db app.kubernetes.io/part-of=fruit-service-app -n ${TEST_PROJECT} && \
+oc label dc/postgresql-db app.openshift.io/runtime=postgresql --overwrite=true -n ${TEST_PROJECT} 
 ```
 
 ### SECURITY/ROLES
@@ -120,8 +120,8 @@ oc policy add-role-to-user view system:serviceaccount:${DEV_PROJECT}:jenkins -n 
 oc policy add-role-to-user system:image-puller system:serviceaccount:${TEST_PROJECT}:default -n ${DEV_PROJECT}
 ```
 
-oc policy add-role-to-user edit system:serviceaccount:${DEV_PROJECT}:jenkins -n ${DEV_PROJECT} && \
-oc policy add-role-to-user view system:serviceaccount:${DEV_PROJECT}:jenkins -n ${DEV_PROJECT}
+#oc policy add-role-to-user edit system:serviceaccount:${DEV_PROJECT}:jenkins -n ${DEV_PROJECT} && \
+#oc policy add-role-to-user view system:serviceaccount:${DEV_PROJECT}:jenkins -n ${DEV_PROJECT}
 
 ### CREATE PIPELINE
 
