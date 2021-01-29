@@ -89,7 +89,7 @@ spec:
                 script {
                   dir("${CONTEXT_DIR}") {
                     openshift.withCluster() {
-                        openshift.selector("bc", "${BUILD_NAME}").startBuild("--from-file=./target/${APP_NAME}-dev-${POM_VERSION}.jar", "--wait")
+                        openshift.selector("bc", "${BUILD_NAME}").startBuild("--from-file=./target/${APP_NAME}-${POM_VERSION}.jar", "--wait")
                     }      
                   }
                 }
@@ -110,7 +110,7 @@ spec:
                 script {
                   openshift.withCluster() {
                     openshift.withProject("${DEV_PROJECT_NAME}") {
-                        openshift.newApp("${DEV_PROJECT_NAME}/${BUILD_NAME}:latest", "--name=${APP_NAME} -e SERVICE_DB_USER=luke -e SERVICE_DB_PASSWORD=secret -e SERVICE_DB_HOST=my-database -e SERVICE_DB_NAME=my_data -e JAVA_OPTIONS=-Dspring.profiles.active=${ACTIVE_PROFILE} -l app=${APP_NAME},version=${POM_VERSION},provider=jenkins").narrow('svc').expose()
+                        openshift.newApp("${DEV_PROJECT_NAME}/${BUILD_NAME}:latest", "--name=${APP_NAME} -e SERVICE_DB_USER=luke -e SERVICE_DB_PASSWORD=secret -e SERVICE_DB_HOST=postgresql-db -e SERVICE_DB_NAME=FRUITSDB -e JAVA_OPTIONS=-Dspring.profiles.active=${ACTIVE_PROFILE} -l app=${APP_NAME},version=${POM_VERSION},provider=jenkins").narrow('svc').expose()
                         def liveness = openshift.raw( "set probe deployment/${APP_NAME} --liveness --get-url=http://:8080/actuator/health --initial-delay-seconds=180" )
                         echo "After set probe liveness: ${liveness.out}"
                         def readiness = openshift.raw( "set probe deployment/${APP_NAME} --readiness --get-url=http://:8080/api/fruits --timeout-seconds=3 --initial-delay-seconds=10" )
@@ -119,7 +119,7 @@ spec:
                         echo "After label part-of: ${partOfLabel.out}"
                         def runtimeLabel = openshift.raw( "label deployment/${APP_NAME} app.openshift.io/runtime=spring" )
                         echo "After label runtime: ${runtimeLabel.out}"
-                        def connectsToAnnotation = openshift.raw( "annotate deployment/${APP_NAME} app.openshift.io/connects-to=my-database" )
+                        def connectsToAnnotation = openshift.raw( "annotate deployment/${APP_NAME} app.openshift.io/connects-to=postgresql-db" )
                         echo "After annotate connects-to: ${connectsToAnnotation.out}"
                     }
                   }
@@ -159,7 +159,7 @@ spec:
                 script {
                   openshift.withCluster() {
                     openshift.withProject("${TEST_PROJECT_NAME}") {
-                        openshift.newApp("${DEV_PROJECT_NAME}/${BUILD_NAME}:test", "--name=${APP_NAME} -e SERVICE_DB_USER=luke -e SERVICE_DB_PASSWORD=secret -e SERVICE_DB_HOST=my-database -e SERVICE_DB_NAME=my_data -e JAVA_OPTIONS=-Dspring.profiles.active=${ACTIVE_PROFILE} -l app=${APP_NAME},version=${POM_VERSION},provider=jenkins").narrow('svc').expose()
+                        openshift.newApp("${DEV_PROJECT_NAME}/${BUILD_NAME}:test", "--name=${APP_NAME} -e SERVICE_DB_USER=luke -e SERVICE_DB_PASSWORD=secret -e SERVICE_DB_HOST=postgresql-db -e SERVICE_DB_NAME=FRUITSDB -e JAVA_OPTIONS=-Dspring.profiles.active=${ACTIVE_PROFILE} -l app=${APP_NAME},version=${POM_VERSION},provider=jenkins").narrow('svc').expose()
                         def liveness = openshift.raw( "set probe deployment/${APP_NAME} --liveness --get-url=http://:8080/actuator/health --initial-delay-seconds=180" )
                         echo "After set probe liveness: ${liveness.out}"
                         def readiness = openshift.raw( "set probe deployment/${APP_NAME} --readiness --get-url=http://:8080/api/fruits --timeout-seconds=3 --initial-delay-seconds=10" )
@@ -168,7 +168,7 @@ spec:
                         echo "After label part-of: ${partOfLabel.out}"
                         def runtimeLabel = openshift.raw( "label deployment/${APP_NAME} app.openshift.io/runtime=spring" )
                         echo "After label runtime: ${runtimeLabel.out}"
-                        def connectsToAnnotation = openshift.raw( "annotate deployment/${APP_NAME} app.openshift.io/connects-to=my-database" )
+                        def connectsToAnnotation = openshift.raw( "annotate deployment/${APP_NAME} app.openshift.io/connects-to=postgresql-db" )
                         echo "After annotate connects-to: ${connectsToAnnotation.out}"
                     }
                   }
