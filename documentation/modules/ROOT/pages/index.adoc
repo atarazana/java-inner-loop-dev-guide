@@ -22,6 +22,15 @@ Optionally, although highly recommendable, you will do the same but this time ag
 
 NOTE: No worries if you don't have an Oracle database at hand, we'll show you how you can have an Oracle database running in a container in your OpenShift cluster (for testing purposes and as long as you have an OTN developer account you can use to pull images from the Oracle Container Registry).
 
+[.text-center.strong]
+== Objectives of this lab
+
+The main objective of this lab is to guide you through the cycle of developing cloud native applications stressing on the inner-loop, that is all the activities a developer so in his/her computer before actually pushing code to the repository.
+
+In this particular case we have a Spring Boot CRUD application, so Java code and a database. Which database? Well we have decided to use *H2* for quick prototyping then *PostgreSQL* or *Oracle* once the code is deployed.
+
+We'll explore different options to deploy and debug or test the code on OpenShift as well as locally.
+
 [.tiles.browse]
 == Browse modules
 
@@ -30,11 +39,22 @@ xref:01-setup.adoc[Get Started]
 //* xref:01-setup.adoc#minikube[Minikube]
 
 [.tile]
-.xref:02a-deploy-postgresql.adoc[Spring Boot + PostgreSQL]
-* xref:02a-deploy-postgresql.adoc#package[Package the Application]
-* xref:02a-deploy-postgresql.adoc#deploy[Deploy the Application]
+.xref:02a-deploy-postgresql.adoc[Spring Boot => PostgreSQL]
+** xref:02a-deploy-postgresql.adoc#the-code[The code]
+** xref:02a-deploy-postgresql.adoc#maven-profiles[Maven Profiles]
+** xref:02a-deploy-postgresql.adoc#run-local[Running the code locally against H2]
+** xref:02a-deploy-postgresql.adoc#deploy-database[Deploying PostgreSQL]
+** xref:02a-deploy-postgresql.adoc#deploy-code[Deploying the code]
+** xref:02a-deploy-postgresql.adoc#run-local-telepresence[Running locally against PostgreSQL with telepresence]
+** xref:02a-deploy-postgresql.adoc#binary-deploy[Binary deploy S2I]
+
 
 [.tile]
-.xref:02b-deploy-oracle.adoc[Spring Boot + Oracle]
-* xref:02b-deploy-oracle.adoc#package[Package the Application]
-* xref:02b-deploy-oracle.adoc#deploy[Deploy the Application]
+.xref:02b-deploy-oracle.adoc[Spring Boot => Oracle]
+** xref:02b-deploy-oracle.adoc#the-code[The code]
+** xref:02b-deploy-oracle.adoc#maven-profiles[Maven Profiles]
+** xref:02b-deploy-oracle.adoc#run-local[Running the code locally against H2]
+** xref:02b-deploy-oracle.adoc#deploy-database[Deploying PostgreSQL]
+** xref:02b-deploy-oracle.adoc#deploy-code[Deploying the code]
+** xref:02b-deploy-oracle.adoc#run-local-telepresence[Running locally against PostgreSQL with telepresence]
+** xref:02b-deploy-oracle.adoc#binary-deploy[Binary deploy S2I]

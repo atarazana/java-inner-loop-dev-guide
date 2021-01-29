@@ -99,7 +99,7 @@ oc label dc/jenkins app.openshift.io/runtime=jenkins --overwrite=true -n ${DEV_P
 Deploy DB in ${DEV_PROJECT}
 
 ```sh
-oc new-app -e POSTGRESQL_USER=luke -ePOSTGRESQL_PASSWORD=secret -ePOSTGRESQL_DATABASE=my_data centos/postgresql-10-centos7 --as-deployment-config=true --name=postgresql-db -n ${DEV_PROJECT}
+oc new-app -e POSTGRESQL_USER=luke -ePOSTGRESQL_PASSWORD=secret -ePOSTGRESQL_DATABASE=FRUITSDB centos/postgresql-10-centos7 --as-deployment-config=true --name=postgresql-db -n ${DEV_PROJECT}
 oc label dc/postgresql-db app.kubernetes.io/part-of=fruit-service-app -n ${DEV_PROJECT} && \
 oc label dc/postgresql-db app.openshift.io/runtime=postgresql --overwrite=true -n ${DEV_PROJECT} 
 ```
@@ -107,7 +107,7 @@ oc label dc/postgresql-db app.openshift.io/runtime=postgresql --overwrite=true -
 Deploy DB in ${TEST_PROJECT}
 
 ```sh
-oc new-app -e POSTGRESQL_USER=luke -ePOSTGRESQL_PASSWORD=secret -ePOSTGRESQL_DATABASE=my_data centos/postgresql-10-centos7 --as-deployment-config=true --name=postgresql-db -n ${TEST_PROJECT}
+oc new-app -e POSTGRESQL_USER=luke -ePOSTGRESQL_PASSWORD=secret -ePOSTGRESQL_DATABASE=FRUITSDB centos/postgresql-10-centos7 --as-deployment-config=true --name=postgresql-db -n ${TEST_PROJECT}
 oc label dc/postgresql-db app.kubernetes.io/part-of=fruit-service-app -n ${TEST_PROJECT} && \
 oc label dc/postgresql-db app.openshift.io/runtime=postgresql --overwrite=true -n ${TEST_PROJECT} 
 ```

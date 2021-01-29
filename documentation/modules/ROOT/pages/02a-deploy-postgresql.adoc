@@ -1,10 +1,6 @@
 = Spring Boot Inner-loop Development Iteration Using PostgreSQL
 include::_attributes.adoc[]
 
-The main objective of this lab is to guide you through the cycle of developing cloud native applications stressing on the inner-loop, that is all the activities a developer so in his/her computer before actually pushing code to the repository.
-
-In this particular case we have a Spring Boot CRUD application, so Java code and a database. Which database? Well we have decided to use *H2* for quick prototyping then *PostgreSQL* or *Oracle* once the code is deployed.
-
 [#the-code]
 == The code
 
@@ -279,7 +275,7 @@ In order to run our application, we need a namespace, let's create one:
 [.console-input]
 [source,bash,options="nowrap",subs="attributes+"]
 ----
-export PROJECT_NAME={artifact_id}-dev
+export PROJECT_NAME={artifact_id}-postgresql-dev
 oc new-project $\{PROJECT_NAME}
 ----
 
@@ -378,7 +374,7 @@ telepresence --swap-deployment {artifact_id} --expose 8080
 Evetually you'll se something like this:
 
 [.console-output]
-[source,bash,options="nowrap",subs="attributes+"]
+[source,text,options="nowrap",subs="attributes+"]
 ----
 ...
 T: Forwarding remote port 9779 to local port 9779.
@@ -433,4 +429,140 @@ image::fruit-service-postgresql-display.png[Fruit Service on PostgreSQL]
 [#binary-deploy]
 == Binary deploy S2I
 
-TODO
+Finally, imagine that after debugging your code locally you want to redeploy on OpenShift in a similar way but without using the JKube extension. This is possible because JKube is leveraging Source to Image (S2I) let's have a look to the `BuildConfigs` in our project.
+
+Let's do this.
+[.console-input]
+[source,bash,options="nowrap",subs="attributes+"]
+----
+oc get bc -n $\{PROJECT_NAME}
+----
+
+And you should get this.
+[.console-output]
+[source,bash,options="nowrap",subs="attributes+"]
+----
+NAME                TYPE     FROM     LATEST
+{artifact_id}-s2i   Source   Binary   2
+----
+
+Let's read some details:
+[.console-input]
+[source,bash,options="nowrap",subs="attributes+"]
+----
+oc get bc/{artifact_id}-s2i -o yaml -n $\{PROJECT_NAME}
+----
+
+And you should get this. We have deleted transient or obvious data to focus on the important part of the YAML.
+
+NOTE: Focus on `spec->source->type` => `Binary` this means that in order to build image `spec->output->to->name` you need to provide a binary file, a `JAR` file in this case.
+
+[.console-output]
+[source,yaml,options="nowrap",subs="attributes+"]
+----
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  labels:
+    app: {artifact_id}
+    group: dev.snowdrop.example
+    provider: jkube
+    version: 1.0.0
+  name: {artifact_id}-s2i
+  namespace: fruits-postgresql-dev
+  ...
+spec:
+  failedBuildsHistoryLimit: 5
+  nodeSelector: null
+  output:
+    to:
+      kind: ImageStreamTag
+      name: {artifact_id}:1.0.0
+  postCommit: {}
+  resources: {}
+  runPolicy: Serial
+  source:
+    binary: {}
+    type: Binary
+  strategy:
+    sourceStrategy:
+      from:
+        kind: DockerImage
+        name: registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:latest
+    type: Source
+  successfulBuildsHistoryLimit: 5
+status:
+...
+----
+
+Let's package our application with the right profile and build an image with it:
+[.console-input]
+[source,bash,options="nowrap",subs="attributes+"]
+----
+mvn clean package -Popenshift-postgresql
+----
+
+After a successful build, let's start the build of the image in OpenShift:
+[.console-input]
+[source,bash,options="nowrap",subs="attributes+"]
+----
+oc start-build {artifact_id}-s2i --from-file=./target/{artifact_id}-1.0.0.jar -n ${PROJECT_NAME}
+----
+
+As you can see in the output the `JAR` file is uploaded and a new Build is started.
+[.console-output]
+[source,bash,options="nowrap",subs="attributes+"]
+----
+Uploading file "target/{artifact_id}-1.0.0.jar" as binary input for the build ...
+...
+Uploading finished
+build.build.openshift.io/{artifact_id}-s2i-3 started
+----
+
+And let's have a look to the logs while the build is happening:
+[.console-input]
+[source,bash,options="nowrap",subs="attributes+"]
+----
+oc logs -f bc/{artifact_id}-s2i -n ${PROJECT_NAME}
+----
+
+Log output from the current build (only relevant lines):
+
+NOTE: It all starts with `Receiving source from STDIN as file {artifact_id}-1.0.0.jar` so the image is built from a binary file within OpenShift as we checked out before.
+
+[.console-output]
+[source,bash,options="nowrap",subs="attributes+"]
+----
+Receiving source from STDIN as file {artifact_id}-1.0.0.jar
+Caching blobs under "/var/cache/blobs".
+Getting image source signatures
+...
+Writing manifest to image destination
+Storing signatures
+Generating dockerfile with builder image registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:latest
+STEP 1: FROM registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:latest
+STEP 2: LABEL "io.openshift.build.source-location"="/tmp/build/inputs"       "io.openshift.s2i.destination"="/tmp"       "io.openshift.build.image"="registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:latest"
+STEP 3: ENV OPENSHIFT_BUILD_NAME="{artifact_id}-s2i-3"     OPENSHIFT_BUILD_NAMESPACE="fruits-postgresql-dev"
+STEP 4: USER root
+STEP 5: COPY upload/src /tmp/src
+STEP 6: RUN chown -R 185:0 /tmp/src
+STEP 7: USER 185
+STEP 8: RUN /usr/local/s2i/assemble
+INFO S2I source build with plain binaries detected
+INFO Copying binaries from /tmp/src to /deployments ...
+{artifact_id}-1.0.0.jar
+STEP 9: CMD /usr/local/s2i/run
+STEP 10: COMMIT temp.builder.openshift.io/fruits-postgresql-dev/{artifact_id}-s2i-3:5b6ab412
+Getting image source signatures
+...
+Writing manifest to image destination
+Storing signatures
+--> 56ea06fd4ac
+56ea06fd4ac030f9d3356a917c6a31aaa791d6fff000852a4e87eedbf06432ad
+
+Pushing image image-registry.openshift-image-registry.svc:5000/fruits-postgresql-dev/{artifact_id}:1.0.0 ...
+Getting image source signatures
+...
+Successfully pushed image-registry.openshift-image-registry.svc:5000/fruits-postgresql-dev/{artifact_id}@sha256:ae0a508200be22c45f3af7d5cd7f7ad32351f480f50b15bc9ad71b76fb37fa54
+Push successful
+----

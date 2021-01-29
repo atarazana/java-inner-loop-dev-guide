@@ -9,8 +9,14 @@
 ** xref:02a-deploy-postgresql.adoc#deploy-database[Deploying PostgreSQL]
 ** xref:02a-deploy-postgresql.adoc#deploy-code[Deploying the code]
 ** xref:02a-deploy-postgresql.adoc#run-local-telepresence[Running locally against PostgreSQL with telepresence]
+** xref:02a-deploy-postgresql.adoc#binary-deploy[Binary deploy S2I]
 
 
-* xref:02b-deploy-oracle.adoc[Deploy Service => Oracle]
-** xref:02b-deploy-oracle.adoc#package[Build Service]
-** xref:02b-deploy-oracle.adoc#deploy[Deploy Dervice]
+* xref:02b-deploy-oracle.adoc[Spring Boot => Oracle]
+** xref:02b-deploy-oracle.adoc#the-code[The code]
+** xref:02b-deploy-oracle.adoc#maven-profiles[Maven Profiles]
+** xref:02b-deploy-oracle.adoc#run-local[Running the code locally against H2]
+** xref:02b-deploy-oracle.adoc#deploy-database[Deploying PostgreSQL]
+** xref:02b-deploy-oracle.adoc#deploy-code[Deploying the code]
+** xref:02b-deploy-oracle.adoc#run-local-telepresence[Running locally against PostgreSQL with telepresence]
+** xref:02b-deploy-oracle.adoc#binary-deploy[Binary deploy S2I]
