@@ -39,8 +39,8 @@
     <oracle.version>19.6.0.0</oracle.version>
     <rest-assured.version>3.1.0</rest-assured.version>
     <spring-boot.version>2.2.10.RELEASE</spring-boot.version>
-    <jkube.generator.from>registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:${openjdk18-openshift.version}</jkube.generator.from>
-    <fabric8-maven-plugin.version>4.1.0</fabric8-maven-plugin.version>
+    <jkube.version>1.1.0</jkube.version>
+    <!--<jkube.generator.from>registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:${openjdk18-openshift.version}</jkube.generator.from>-->
   </properties>
   <licenses>
     <license>
@@ -211,7 +211,7 @@
         <plugin>
           <groupId>org.eclipse.jkube</groupId>
           <artifactId>openshift-maven-plugin</artifactId>
-          <version>1.0.2</version>
+          <version>${jkube.version}</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -300,6 +300,7 @@
           <plugin>
             <groupId>org.eclipse.jkube</groupId>
             <artifactId>openshift-maven-plugin</artifactId>
+            <version>${jkube.version}</version>
             <executions>
               <execution>
                 <id>fmp</id>
@@ -338,6 +339,7 @@
           <plugin>
             <groupId>org.eclipse.jkube</groupId>
             <artifactId>openshift-maven-plugin</artifactId>
+            <version>${jkube.version}</version>
             <executions>
               <execution>
                 <id>fmp</id>
