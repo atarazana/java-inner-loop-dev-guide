@@ -15,17 +15,17 @@ In order to run our application, we need a namespace, let's create one:
 ----
 $ export PROJECT_NAME=fruits-postgresql-dev
 
-$ oc new-project $/{PROJECT_NAME}
+$ oc new-project $\{PROJECT_NAME}
 ----
 
 In order for application to work we'll first deploy a PostgreSQL database then our example application, to do so run these commands:
 [source,bash,options="nowrap",subs="attributes+"]
 ----
 $ oc new-app -e POSTGRESQL_USER=luke -e POSTGRESQL_PASSWORD=secret -e POSTGRESQL_DATABASE=FRUITSDB \
-  centos/postgresql-10-centos7 --as-deployment-config=true --name=postgresql-db -n $/{PROJECT_NAME}
+  centos/postgresql-10-centos7 --as-deployment-config=true --name=postgresql-db -n $\{PROJECT_NAME}
 
-$ oc label dc/postgresql-db app.kubernetes.io/part-of=fruit-service-app -n $/{PROJECT_NAME} && \
-  oc label dc/postgresql-db app.openshift.io/runtime=postgresql --overwrite=true -n $/{PROJECT_NAME} 
+$ oc label dc/postgresql-db app.kubernetes.io/part-of=fruit-service-app -n $\{PROJECT_NAME} && \
+  oc label dc/postgresql-db app.openshift.io/runtime=postgresql --overwrite=true -n $\{PROJECT_NAME} 
 
 $ mvn clean oc:deploy -Popenshift-postgresql
 ----
@@ -220,14 +220,14 @@ In order to run our application, we need a namespace, let's create one:
 ----
 $ export PROJECT_NAME=fruits-oracle-dev
 
-$ oc new-project $/{PROJECT_NAME}
+$ oc new-project $\{PROJECT_NAME}
 ----
 
 We want to connect to the Oracle DB as if it were external, so let'd create a Service using a external name:
 
 [source,bash,options="nowrap",subs="attributes+"]
 ----
-cat <<EOF | oc apply -n $/{PROJECT_NAME} -f -
+cat <<EOF | oc apply -n $\{PROJECT_NAME} -f -
 apiVersion: v1
 kind: Service
 metadata:
@@ -267,7 +267,7 @@ EOF
 Ok, time to deploy our oracle-flavoured application, please execute these commands:
 [source,bash,options="nowrap",subs="attributes+"]
 ----
-$ oc project $\/{PROJECT_NAME}
+$ oc project $\{PROJECT_NAME}
 
 $ mvn clean oc:deploy -Popenshift-oracle
 ----
