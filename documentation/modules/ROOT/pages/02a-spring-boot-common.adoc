@@ -88,6 +88,9 @@ public class FruitController {
 }
 ----
 
+[#getting-the-code]
+== Getting the Code
+
 Time to get our hands dirty. Clone or download the code, your choice.
 
 [tabs]
@@ -97,16 +100,26 @@ Clone the code::
 [.console-input]
 [source,bash,subs="attributes+"]
 --
-git clone {git_url}
+git clone --single-branch --branch {git_ref} {git_base}/{git_uri}.git
 --
 Download the code::
 +
 [.console-input]
 [source,bash,subs="attributes+"]
 --
-curl -OL {download_url}
+curl -L {git_base}/{git_uri}/archive/{git_ref}.zip -o {git_uri}.zip
+unzip {git_uri}.zip
+mv {git_uri}-{git_ref} {git_uri}
 --
 ====
+
+Change to the dir where the code is.
+
+[.console-input]
+[source,bash,subs="attributes+"]
+--
+cd {git_uri}/apps/spring-boot-app
+--
 
 [#maven-profiles]
 == Maven Profiles
