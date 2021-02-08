@@ -2,3 +2,4 @@ include::versions.adoc[]
 :experimental: true
 :source-highlighter: highlightjs
 :artifact_id: fruit-service
+:artifact_id_quarkus: atomic-fruit-service

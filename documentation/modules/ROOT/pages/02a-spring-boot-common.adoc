@@ -4,7 +4,7 @@ include::_attributes.adoc[]
 [#the-code]
 == The code
 
-This simple service implements a CRUD interface for the `FRUIT` table. To do so, it uses JPA annotations like `@Entity`, `@Id`, etc. You can find the Java code of the JPA entity below.
+Our simple application exposes a CRUD interface for a table (`FRUIT`) in a relational database by using JPA and Hiebernate as the `ORM` framework. To do so, it uses JPA annotations like `@Entity`, `@Id`, etc. You can find the Java code of the JPA entity below.
 
 NOTE: In order to make the code more portable we have annotated the `id` attribute so that the value is generated using a sequence named `FRUIT_SEQ`. 
 

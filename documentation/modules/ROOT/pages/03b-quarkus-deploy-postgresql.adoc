@@ -1,0 +1,333 @@
+= Spring Boot Inner-loop Development Iteration Using PostgreSQL
+include::_attributes.adoc[]
+
+So before we deploy the code we need a Database right? For the sake of simplicity let's deploy PostgreSQL using some simple commands. Maybe in your real deployment you'd use an external instance, sure, we take that into account in the 
+
+[#deploy-database]
+== Deploying PostgreSQL on OCP
+
+WARNING: Before proceeding log in your cluster using `oc login` with a normal user no need for special permissions.
+
+In order to run our application, we need a namespace, let's create one:
+
+[.console-input]
+[source,bash,options="nowrap",subs="attributes+"]
+----
+export PROJECT_NAME={artifact_id}-postgresql-dev
+oc new-project $\{PROJECT_NAME}
+----
+
+In order for the application to work properly we'll first deploy a `PostgreSQL` database, then the code, to do so run these commands:
+
+[.console-input]
+[source,bash,options="nowrap",subs="attributes+"]
+----
+oc new-app -e POSTGRESQL_USER=luke -e POSTGRESQL_PASSWORD=secret -e POSTGRESQL_DATABASE=FRUITSDB \
+  centos/postgresql-10-centos7 --as-deployment-config=true --name=postgresql-db -n $\{PROJECT_NAME}
+----
+
+Now let's label the deployment so that it look better in the web console:
+
+[.console-input]
+[source,bash,options="nowrap",subs="attributes+"]
+----
+oc label dc/postgresql-db app.kubernetes.io/part-of=fruit-service-app -n $\{PROJECT_NAME} && \
+  oc label dc/postgresql-db app.openshift.io/runtime=postgresql --overwrite=true -n $\{PROJECT_NAME} 
+----
+
+Check the database is running:
+
+[.console-input]
+[source,bash,options="nowrap",subs="attributes+"]
+----
+oc get pod -n $\{PROJECT_NAME}
+----
+
+You should see something like this:
+[.console-output]
+[source,bash,options="nowrap",subs="attributes+"]
+----
+NAME                        READY   STATUS      RESTARTS   AGE
+postgresql-db-1-deploy      0/1     Completed   0          2d6h
+postgresql-db-1-n585q       1/1     Running     0          2d6h
+----
+
+[TIP]
+===============================
+You can also run this command to check the name of the POD:
+[.console-input]
+[source,bash,options="nowrap",subs="attributes+"]
+----
+oc get pods -n $\{PROJECT_NAME} -o json | jq -r '.items[] | select(.status.phase | test("Running")) | select(.metadata.name | test("postgresql-db")).metadata.name'
+----
+===============================
+
+[#deploy-code]
+== Deploying the code on OCP
+
+[.console-input]
+[source,bash,options="nowrap",subs="attributes+"]
+----
+mvn clean package -Dquarkus.kubernetes.deploy=true -DskipTests -Dquarkus.profile=prod-postgresql
+----
+
+Move to the OpenShift web console and from `Topology` in the `Developer` perspective click on the route link as in the picture.
+
+image::fruit-service-postgresql-topology-quarkus.png[Fruit Service on PostgreSQL Topology]
+
+You should see this.
+
+image::fruit-service-postgresql-display-quarkus.png[Fruit Service on PostgreSQL Topology]
+
+[#run-local-telepresence]
+== Running locally against PostgreSQL with `telepresence`
+
+.Permissions needed
+[IMPORTANT]
+===============================
+This needs to be run by a `cluster-admin`
+
+[.console-input]
+[source,bash,options="nowrap",subs="verbatim,attributes+"]
+----
+oc adm policy add-scc-to-user privileged -z default -n $\{PROJECT_NAME}
+oc adm policy add-scc-to-user anyuid -z default -n $\{PROJECT_NAME}
+----
+===============================
+
+NOTE: Telepresence will modify the network so that Services in Kubernetes are reachable from your laptop and viceversa. 
+
+The next command will result in the deployment for our application being scaled down to zero and the network altered so that traffic to it ends up in your laptop in port `8080`.
+
+IMPORTANT: You'll be asked for `sudo` password, this is normal, telepresence needs to be able to modify networking rules so that you can see Kubernetes Services as local.
+
+[.console-input]
+[source,bash,options="nowrap",subs="attributes+"]
+----
+export TELEPRESENCE_USE_OCP_IMAGE=NO
+oc project $\{PROJECT_NAME}
+telepresence --swap-deployment {artifact_id_quarkus} --expose 8080
+----
+
+Evetually you'll se something like this:
+
+[.console-output]
+[source,text,options="nowrap",subs="attributes+"]
+----
+...
+T: Forwarding remote port 8080 to local port 8080.
+
+T: Guessing that Services IP range is ['172.30.0.0/16']. Services started after this point will be inaccessible if are outside this range; restart telepresence 
+T: if you can't access a new Service.
+T: Connected. Flushing DNS cache.
+T: Setup complete. Launching your command.
+
+The default interactive shell is now zsh.
+To update your account to use zsh, please run `chsh -s /bin/zsh`.
+For more details, please visit https://support.apple.com/kb/HT208050.
+@fruit-service-postgresql-dev/api-cluster-6d30-6d30-example-opentlc-com:6443/user1|bash-3.2$
+----
+
+In the `Topology` view you should see this.
+
+NOTE: Our deployment has been scaled down to zero and substituted by a pod generated by `Telepresence`.
+
+image::fruit-service-postgresql-topology-telepresence-quarkus.png[Fruit Service on PostgreSQL Topology - Quarkus with Telepresence]
+
+[TIP]
+===============================
+Run from another terminal:
+[.console-input]
+[source,bash,options="nowrap",subs="attributes+"]
+----
+curl http://postgresql-db:5432
+----
+
+You should receive which looks bad but it's actually good, this means that the DNS Service name local to Kubernetes can be resolved from your computer and that the port `5432` has been reached!
+[.console-output]
+[source,bash,options="nowrap",subs="attributes+"]
+----
+curl: (52) Empty reply from server` 
+----
+===============================
+
+Now let's run our code locally but connected to the database (and/or other consumed services). To do so run this command from another terminal:
+[.console-input]
+[source,bash,options="nowrap",subs="attributes+"]
+----
+export PROJECT_NAME={artifact_id}-postgresql-dev
+DB_USER=luke DB_PASSWORD=secret mvn quarkus:dev -Dquarkus.profile=prod-postgresql
+----
+
+Now open a browser and point to link:http://localhost:8080:[http://localhost:8080]
+
+You should see this:
+
+TIP: You can edit, save, delete to test the functionalities implemented by `FruitResource` *and debug locally*.
+
+IMPORTANT: You can also use the external route and get the same result.
+
+image::fruit-service-postgresql-display-telepresence-quarkus.png[Fruit Service on PostgreSQL - Quarkus with Telepresence]
+
+Now you can go to the terminal running the code locally and stop the process with kbd:[Ctrl+C]. 
+
+Also go to the terminal window where `Telepresence` is running locally and type `exit`, you should see something similar to this:
+[.console-output]
+[source,bash,options="nowrap",subs="attributes+"]
+----
+...
+@fruit-service-postgresql-dev/api-cluster-6d30-6d30-example-opentlc-com:6443/user1|bash-3.2$ exit
+exit
+T: Your process has exited.
+T: Exit cleanup in progress
+T: Cleaning up Pod
+----
+
+[#binary-deploy]
+== Binary deploy S2I
+
+Finally, imagine that after debugging your code locally you want to redeploy on OpenShift in a similar way but without using the JKube extension. This is possible because JKube is leveraging Source to Image (S2I) let's have a look to the `BuildConfigs` in our project.
+
+Let's do this.
+[.console-input]
+[source,bash,options="nowrap",subs="attributes+"]
+----
+oc get bc -n $\{PROJECT_NAME}
+----
+
+And you should get this.
+[.console-output]
+[source,bash,options="nowrap",subs="attributes+"]
+----
+NAME                   TYPE     FROM     LATEST
+{artifact_id_quarkus}   Source   Binary   1
+----
+
+Let's read some details:
+[.console-input]
+[source,bash,options="nowrap",subs="attributes+"]
+----
+oc get bc/{artifact_id_quarkus} -o yaml -n $\{PROJECT_NAME}
+----
+
+And you should get this. We have deleted transient or obvious data to focus on the important part of the YAML.
+
+NOTE: Focus on `spec->source->type` => `Binary` this means that in order to build image `spec->output->to->name` you need to provide a binary file, a `JAR` file in this case.
+
+[.console-output]
+[source,yaml,options="nowrap",subs="attributes+"]
+----
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  labels:
+    app.kubernetes.io/name: {artifact_id_quarkus}
+    app.kubernetes.io/part-of: fruit-service-app
+    app.kubernetes.io/version: 1.0-SNAPSHOT
+    app.openshift.io/runtime: quarkus
+    department: fruity-dept
+  name: {artifact_id_quarkus}
+  namespace: fruit-service-postgresql-dev
+  ...
+spec:
+  nodeSelector: null
+  output:
+    to:
+      kind: ImageStreamTag
+      name: {artifact_id_quarkus}:1.0-SNAPSHOT
+  postCommit: {}
+  resources: {}
+  runPolicy: Serial
+  source:
+    binary: {}
+    type: Binary
+  strategy:
+    sourceStrategy:
+      from:
+        kind: ImageStreamTag
+        name: openjdk-11:latest
+    type: Source
+status:
+...
+----
+
+Let's package our application with the right profile and build an image with it:
+[.console-input]
+[source,bash,options="nowrap",subs="attributes+"]
+----
+mvn clean package -DskipTests -Dquarkus.kubernetes.deploy=false -Dquarkus.profile=prod-postgresql
+----
+
+After a successful build, let's start the build of the image in OpenShift:
+
+NOTE: We have to include `target/{artifact_id_quarkus}-1.0-SNAPSHOT-runner.jar` and the contents of `target/lib/` in a zip file and start a new build with it.
+
+[.console-input]
+[source,bash,options="nowrap",subs="attributes+"]
+----
+zip {artifact_id_quarkus}.zip target/lib/* target/{artifact_id_quarkus}-1.0-SNAPSHOT-runner.jar 
+oc start-build {artifact_id_quarkus} --from-archive=./{artifact_id_quarkus}.zip -n $\{PROJECT_NAME}
+rm {artifact_id_quarkus}.zip
+----
+
+As you can see in the output the `JAR` file is uploaded and a new Build is started.
+[.console-output]
+[source,bash,options="nowrap",subs="attributes+"]
+----
+Uploading archive file "{artifact_id_quarkus}.zip" as binary input for the build ...
+
+Uploading finished
+build.build.openshift.io/{artifact_id}-3 started
+----
+
+And let's have a look to the logs while the build is happening:
+[.console-input]
+[source,bash,options="nowrap",subs="attributes+"]
+----
+oc logs -f bc/{artifact_id_quarkus} -n $\{PROJECT_NAME}
+----
+
+Log output from the current build (only relevant lines):
+
+NOTE: It all starts with `Receiving source from STDIN as archive` so the image is built from a binary file within OpenShift as we checked out before.
+
+[.console-output]
+[source,bash,options="nowrap",subs="attributes+"]
+----
+Receiving source from STDIN as archive ...
+Caching blobs under "/var/cache/blobs".
+...
+Storing signatures
+Generating dockerfile with builder image registry.access.redhat.com/ubi8/openjdk-11@sha256:7921ba01d91c5598595dac9a9216e45cd6b175c22d7d859748304067d2097fae
+STEP 1: FROM registry.access.redhat.com/ubi8/openjdk-11@sha256:7921ba01d91c5598595dac9a9216e45cd6b175c22d7d859748304067d2097fae
+STEP 2: LABEL "io.openshift.build.image"="registry.access.redhat.com/ubi8/openjdk-11@sha256:7921ba01d91c5598595dac9a9216e45cd6b175c22d7d859748304067d2097fae"       "io.openshift.build.source-location"="/tmp/build/inputs"       "io.openshift.s2i.destination"="/tmp"
+STEP 3: ENV OPENSHIFT_BUILD_NAME="atomic-fruit-service-4"     OPENSHIFT_BUILD_NAMESPACE="fruit-service-postgresql-dev"
+STEP 4: USER root
+STEP 5: COPY upload/src /tmp/src
+STEP 6: RUN chown -R 185:0 /tmp/src
+STEP 7: USER 185
+STEP 8: RUN /usr/local/s2i/assemble
+INFO S2I source build with plain binaries detected
+INFO Copying binaries from /tmp/src to /deployments ...
+target/
+target/atomic-fruit-service-1.0-SNAPSHOT-runner.jar
+target/lib/
+target/lib/antlr.antlr-2.7.7.jar
+...
+STEP 9: CMD /usr/local/s2i/run
+STEP 10: COMMIT temp.builder.openshift.io/fruit-service-postgresql-dev/atomic-fruit-service-4:31d1775e
+Getting image source signatures
+...
+Writing manifest to image destination
+Storing signatures
+--> cd6e79768eb
+cd6e79768ebfd82c7617a115f558e16e9a8bd3a2eeb8be9ae605c8e48ef9b75f
+
+Pushing image image-registry.openshift-image-registry.svc:5000/fruit-service-postgresql-dev/atomic-fruit-service:1.0-SNAPSHOT ...
+Getting image source signatures
+...
+Writing manifest to image destination
+Storing signatures
+Successfully pushed image-registry.openshift-image-registry.svc:5000/fruit-service-postgresql-dev/atomic-fruit-service@sha256:497f0886ac1d9c5610ec20ea4f899e9617fb549eda28342905ff6369c5af4b2d
+Push successful
+----
