@@ -86,7 +86,7 @@ image::fruit-service-postgresql-display-quarkus.png[Fruit Service on PostgreSQL]
 .Permissions needed
 [IMPORTANT]
 ===============================
-This needs to be run by a `cluster-admin`
+This needs to be run by a `cluster-admin`, but once you run it go back to the normal user.
 
 [.console-input]
 [source,bash,options="nowrap",subs="verbatim,attributes+"]
@@ -187,9 +187,35 @@ T: Cleaning up Pod
 [#run-local-remote-dev]
 == Extending the inner-loop with Quarkus remote development
 
-If you use Quarkus there's another method to extend the inner-loop to your cluster, it's called link:https://quarkus.io/guides/maven-tooling#remote-development-mode[Remote Development Mode]. The idea is simple run your code in the cluster but being able to replace classes/files that you change locally in your IDE.
+If you use Quarkus there's another method to extend the inner-loop to your cluster, it's called link:https://quarkus.io/guides/maven-tooling#remote-development-mode[Remote Development Mode]. The idea is simple, run your code in the cluster while being able to replace classes/files that you change locally in your IDE automatically.
 
-Let's first delete the current deployment, then deploy with remote development mode enabled. Run the following commands:
+There are two parts in this setup:
+
+* The server side, where the code runs in a container (in OpenShift for instance)
+* The client side, where you connect to the server side and files are watched and uploaded whenever changes are detected
+
+A couple of things to take into account regarding the server side:
+
+1. The normal `JAR` is substituted by a `mutable` or `fast` JAR, that can be updated/reloaded live
+2. An environment variable `QUARKUS_LAUNCH_DEVMODE` needs to be set to `true`
+
+In order to use remote development we need to update the `appllication.properties` file, please add these two lines at the top of the file.
+
+[NOTE]
+===============================
+1. We only need these properties while using remote development and you should comment them once you're done.
+2. You can (or even should) update the live-reload password as it's checked while connecting to the server side of the remote development set up.
+===============================
+
+[.console-input]
+[source,bash,options="nowrap",subs="attributes+"]
+----
+# REMOTE DEV
+quarkus.package.type=mutable-jar
+quarkus.live-reload.password=changeit2
+----
+
+Now, delete the current deployment, then deploy it again but this time with remote development mode enabled. Please, run the following commands in order to do so:
 
 [IMPORTANT]
 ===============================
@@ -358,19 +384,31 @@ image::fruit-service-postgresql-display-new-remote-dev-quarkus.png[Fruit Service
 
 TIP: Don't forget that whenever you change a file locally the app is rebuilt and relevant elements and uploaded and refreshed
 
+IMPORTANT: Once you're done with the remote development mode don't forget to comment the lines we added before, as in the next exceprt.
+
+[.console-input]
+[source,bash,options="nowrap",subs="attributes+"]
+----
+# REMOTE DEV
+#quarkus.package.type=mutable-jar
+#quarkus.live-reload.password=changeit2
+----
+
 [#binary-deploy]
 == Binary deploy S2I
 
-Finally, imagine that after debugging your code locally you want to redeploy on OpenShift in a similar way but without using the JKube extension. This is possible because JKube is leveraging Source to Image (S2I) let's have a look to the `BuildConfigs` in our project.
+Finally, imagine that after debugging your code locally you want to redeploy on OpenShift in a similar way but without using the OpenShift extension. Well, this is possible by leveraging Source to Image (S2I) let's have a look to the `BuildConfigs` in our project.
 
-Let's do this.
+NOTE: Once you have deployed your code using the OpenShift plugin one `BuildConfig` has been created for you ({artifact_id_quarkus} in this case). But if you had started from the scratch you could have created that `BuildConfig` by hand and use the technique we're explaining here.
+
+So first of all let's get the BCs (`BuildConfigs`) in our namespace:
 [.console-input]
 [source,bash,options="nowrap",subs="attributes+"]
 ----
 oc get bc -n $\{PROJECT_NAME}
 ----
 
-And you should get this.
+You should get this:
 [.console-output]
 [source,bash,options="nowrap",subs="attributes+"]
 ----
@@ -385,7 +423,7 @@ Let's read some details:
 oc get bc/{artifact_id_quarkus} -o yaml -n $\{PROJECT_NAME}
 ----
 
-And you should get this. We have deleted transient or obvious data to focus on the important part of the YAML.
+We have copied the relevants parts below to focus on the important part of the BC YAML.
 
 NOTE: Focus on `spec->source->type` => `Binary` this means that in order to build image `spec->output->to->name` you need to provide a binary file, a `JAR` file in this case.
 
@@ -506,3 +544,5 @@ Storing signatures
 Successfully pushed image-registry.openshift-image-registry.svc:5000/fruit-service-postgresql-dev/atomic-fruit-service@sha256:497f0886ac1d9c5610ec20ea4f899e9617fb549eda28342905ff6369c5af4b2d
 Push successful
 ----
+
+You can now test the new image as we have done before!

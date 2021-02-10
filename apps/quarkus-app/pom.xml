@@ -17,6 +17,7 @@
     <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
     <quarkus.platform.version>1.10.5.Final</quarkus.platform.version>
     <surefire-plugin.version>3.0.0-M5</surefire-plugin.version>
+    <oracle-jdbc.version>19.6.0.0</oracle-jdbc.version>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -51,6 +52,11 @@
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-jdbc-postgresql</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>com.oracle.database.jdbc</groupId>
+        <artifactId>ojdbc8</artifactId>
+        <version>${oracle-jdbc.version}</version>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
