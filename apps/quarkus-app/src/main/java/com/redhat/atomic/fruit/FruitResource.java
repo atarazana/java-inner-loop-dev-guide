@@ -54,7 +54,7 @@ public class FruitResource {
         // persist is available by default
         fruit.persist();
         final URI createdUri = UriBuilder.fromResource(FruitResource.class)
-                        .path(Long.toString(fruit.id))
+                        .path(Integer.toString(fruit.id))
                         .build();
         return Response.created(createdUri).build();
     }
@@ -62,12 +62,23 @@ public class FruitResource {
     @PUT
     @Path("{id}")
     @Transactional
-    public Response updateFruit(@PathParam("id") Long id, Fruit fruit) {
+    public Response updateFruit(@PathParam("id") Integer id, Fruit fruit) {
+        logger.info(String.format("id: %s fruit: %s", id, fruit));
+
         // since the FruitEntity is a panache entity
         // persist is available by default
-        fruit.persist();
+        Fruit found = Fruit.findById(id);
+        logger.info("found" + found);
+        if (found != null) {
+            found.name = fruit.name;
+            found.season = fruit.season;
+            found.persist();
+        } else {
+            fruit.persist();
+        }
+        
         final URI createdUri = UriBuilder.fromResource(FruitResource.class)
-                        .path(Long.toString(id))
+                        .path(Integer.toString(id))
                         .build();
         return Response.created(createdUri).build();
     }
