@@ -1,5 +1,6 @@
 = Spring Boot Inner-loop Development Iteration Using PostgreSQL
 include::_attributes.adoc[]
+:active_profile: prod-postgresql
 
 So before we deploy the code we need a Database right? For the sake of simplicity let's deploy PostgreSQL using some simple commands. Maybe in your real deployment you'd use an external instance, sure, we take that into account in the 
 
@@ -68,7 +69,7 @@ oc get pods -n $\{PROJECT_NAME} -o json | jq -r '.items[] | select(.status.phase
 [.console-input]
 [source,bash,options="nowrap",subs="attributes+"]
 ----
-mvn clean package -Dquarkus.kubernetes.deploy=true -DskipTests -Dquarkus.profile=prod-postgresql
+mvn clean package -Dquarkus.kubernetes.deploy=true -DskipTests -Dquarkus.profile={active_profile}
 ----
 
 Move to the OpenShift web console and from `Topology` in the `Developer` perspective click on the route link as in the picture.
@@ -77,10 +78,10 @@ image::fruit-service-postgresql-topology-quarkus.png[Fruit Service on PostgreSQL
 
 You should see this.
 
-image::fruit-service-postgresql-display-quarkus.png[Fruit Service on PostgreSQL Topology]
+image::fruit-service-postgresql-display-quarkus.png[Fruit Service on PostgreSQL]
 
 [#run-local-telepresence]
-== Running locally against PostgreSQL with `telepresence`
+== Extending the inner-loop with Telepresence
 
 .Permissions needed
 [IMPORTANT]
@@ -156,10 +157,10 @@ Now let's run our code locally but connected to the database (and/or other consu
 [source,bash,options="nowrap",subs="attributes+"]
 ----
 export PROJECT_NAME={artifact_id}-postgresql-dev
-DB_USER=luke DB_PASSWORD=secret mvn quarkus:dev -Dquarkus.profile=prod-postgresql
+DB_USER=luke DB_PASSWORD=secret mvn quarkus:dev -Dquarkus.profile={active_profile}
 ----
 
-Now open a browser and point to link:http://localhost:8080:[http://localhost:8080]
+Now open a browser and point to link:http://localhost:8080[http://localhost:8080, window=_blank]
 
 You should see this:
 
@@ -182,6 +183,180 @@ T: Your process has exited.
 T: Exit cleanup in progress
 T: Cleaning up Pod
 ----
+
+[#run-local-remote-dev]
+== Extending the inner-loop with Quarkus remote development
+
+If you use Quarkus there's another method to extend the inner-loop to your cluster, it's called link:https://quarkus.io/guides/maven-tooling#remote-development-mode[Remote Development Mode]. The idea is simple run your code in the cluster but being able to replace classes/files that you change locally in your IDE.
+
+Let's first delete the current deployment, then deploy with remote development mode enabled. Run the following commands:
+
+[IMPORTANT]
+===============================
+Pay close attention to these system properties we're setting to deploy our code in remote development mode:
+
+* `-Dquarkus.kubernetes.deploy=true`: deploys to target `openshift`
+* `-Dquarkus.profile={active_profile}`: activates this profile
+* `-Dquarkus.container-image.build=true`: builds the image using S2I as target is `openshift`
+* `-Dquarkus.openshift.env-vars.quarkus-launch-devmode.value=true`: this property commands Quarkus plugin to add an environment variable called `QUARKUS_LAUNCH_DEVMODE` with value `true` to the `DeploymentConfig` object
+* `-Dquarkus.openshift.env-vars.quarkus-profile.value={active_profile}`: this property commands Quarkus plugin to add an environment variable called `QUARKUS_PROFILE` with value `{active_profile}` to the `DeploymentConfig` object
+===============================
+
+[.console-input]
+[source,bash,options="nowrap",subs="attributes+"]
+----
+oc delete dc/{artifact_id_quarkus} -n $\{PROJECT_NAME}
+mvn clean package -DskipTests -Dquarkus.kubernetes.deploy=true -Dquarkus.profile={active_profile} \
+  -Dquarkus.container-image.build=true \
+  -Dquarkus.openshift.env-vars.quarkus-launch-devmode.value=true \
+  -Dquarkus.openshift.env-vars.quarkus-profile.value={active_profile}
+----
+
+You should see this:
+
+[.console-output]
+[source,bash,options="nowrap",subs="attributes+"]
+----
+...
+[INFO] [io.quarkus.container.image.openshift.deployment.OpenshiftProcessor] Successfully pushed image-registry.openshift-image-registry.svc:5000/fruit-service-postgresql-dev/atomic-fruit-service@sha256:13c3781e82fa20b664bcc9e3c21a7a51d57c7a140c8232da66aa03ba73ff9b69
+[INFO] [io.quarkus.container.image.openshift.deployment.OpenshiftProcessor] Push successful
+[INFO] [io.quarkus.kubernetes.deployment.KubernetesDeployer] Deploying to openshift server: https://api.cluster-6d30.6d30.example.opentlc.com:6443/ in namespace: fruit-service-postgresql-dev.
+[INFO] [io.quarkus.kubernetes.deployment.KubernetesDeployer] Applied: Secret fruits-db.
+[INFO] [io.quarkus.kubernetes.deployment.KubernetesDeployer] Applied: Service atomic-fruit-service.
+[INFO] [io.quarkus.kubernetes.deployment.KubernetesDeployer] Applied: ImageStream atomic-fruit-service.
+[INFO] [io.quarkus.kubernetes.deployment.KubernetesDeployer] Applied: ImageStream openjdk-11.
+[INFO] [io.quarkus.kubernetes.deployment.KubernetesDeployer] Applied: BuildConfig atomic-fruit-service.
+[INFO] [io.quarkus.kubernetes.deployment.KubernetesDeployer] Applied: DeploymentConfig atomic-fruit-service.
+[INFO] [io.quarkus.kubernetes.deployment.KubernetesDeployer] Applied: Route atomic-fruit-service.
+[INFO] [io.quarkus.kubernetes.deployment.KubernetesDeployer] The deployed application can be accessed at: http://atomic-fruit-service-fruit-service-postgresql-dev.apps.cluster-6d30.6d30.example.opentlc.com
+[INFO] [io.quarkus.deployment.QuarkusAugmentor] Quarkus augmentation completed in 96673ms
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  01:43 min
+[INFO] Finished at: 2021-02-09T13:51:33+01:00
+[INFO] ------------------------------------------------------------------------
+----
+
+Let's check that the deployment is setup correctly for remote development. Be patient here, give it some seconds before you see something, you may even need to run it again.
+
+NOTE: Dont forget to stop the command by typing kbd:[Ctrl+C]
+
+[.console-input]
+[source,bash,options="nowrap",subs="attributes+"]
+----
+oc logs -f dc/{artifact_id_quarkus} | grep -i profile
+----
+
+IMPORTANT: The important thing is that profile *{active_profile}* and *live coding* have been *activated*.
+
+Eventually you'll see this. It just takes some seconds, be patient.
+[.console-output]
+[source,bash,options="nowrap",subs="attributes+"]
+----
+...  [io.quarkus] (Quarkus Main Thread) Profile {active_profile} activated. Live Coding activated.
+----
+
+We need the external route to our service, we'll save the value in `ROUTE_URL` to use it later.
+
+[.console-input]
+[source,bash,options="nowrap",subs="attributes+"]
+----
+export ROUTE_URL="http://$(oc get route/{artifact_id_quarkus} -o jsonpath='{.spec.host}')"
+----
+
+Now we have to connect to our application running in remote dev mode, we'll do it like this.
+
+[.console-input]
+[source,bash,options="nowrap",subs="attributes+"]
+----
+./mvnw quarkus:remote-dev \
+  -Dquarkus.live-reload.url=${ROUTE_URL} \
+  -Dquarkus.profile={active_profile}
+----
+
+You should see something similar to this:
+
+[IMPORTANT]
+==============
+1. Make sure you see `Connected to remote server` at the end of the log.
+2. You'll find interesting that the jar sent while in remote mode is `quarkus-run.jar`, the `mutable-jar`. This fast jar allows sending only those parts that have change and reload them live.
+==============
+
+[.console-output]
+[source,bash,options="nowrap",subs="attributes+"]
+----
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ------------< com.redhat.atomic.fruit:atomic-fruit-service >------------
+[INFO] Building atomic-fruit-service 1.0-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- quarkus-maven-plugin:1.10.5.Final:remote-dev (default-cli) @ atomic-fruit-service ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 5 resources
+[INFO] Nothing to compile - all classes are up to date
+Listening for transport dt_socket at address: 5005
+2021-02-10 11:38:53,921 INFO  [org.jbo.threads] (main) JBoss Threads version 3.1.1.Final
+2021-02-10 11:38:54,138 INFO  [io.qua.kub.dep.KubernetesDeployer] (build-11) Only the first deployment target (which is 'openshift') selected via "quarkus.kubernetes.deployment-target" will be deployed
+2021-02-10 11:38:54,329 INFO  [org.hib.Version] (build-10) HHH000412: Hibernate ORM core version 5.4.26.Final
+2021-02-10 11:38:54,400 WARN  [io.qua.arc.pro.BeanArchives] (build-5) Failed to index boolean: Class does not exist in ClassLoader QuarkusClassLoader:Deployment Class Loader
+[INFO] Checking for existing resources in: /Users/cvicensa/Projects/openshift/atarazana/java-inner-loop-dev-guide/apps/quarkus-app/src/main/kubernetes.
+[INFO] Adding existing Secret with name: fruits-db.
+2021-02-10 11:38:56,848 INFO  [io.qua.dep.QuarkusAugmentor] (main) Quarkus augmentation completed in 3265ms
+2021-02-10 11:38:59,792 INFO  [io.qua.ver.htt.dep.dev.HttpRemoteDevClient] (Remote dev client thread) Sending lib/deployment/appmodel.dat
+2021-02-10 11:38:59,867 INFO  [io.qua.ver.htt.dep.dev.HttpRemoteDevClient] (Remote dev client thread) Sending quarkus-run.jar
+2021-02-10 11:38:59,952 INFO  [io.qua.ver.htt.dep.dev.HttpRemoteDevClient] (Remote dev client thread) Sending app/atomic-fruit-service-1.0-SNAPSHOT.jar
+2021-02-10 11:38:59,989 INFO  [io.qua.ver.htt.dep.dev.HttpRemoteDevClient] (Remote dev client thread) Sending lib/deployment/build-system.properties
+2021-02-10 11:39:00,030 INFO  [io.qua.ver.htt.dep.dev.HttpRemoteDevClient] (Remote dev client thread) Connected to remote server
+----
+
+If you go to the web console you should see this.
+
+image::fruit-service-postgresql-topology-remote-dev-quarkus.png[Fruit Service on PostgreSQL Topology - Quarkus with Remote Dev]
+
+Let's give it a try, shall we?
+
+Open `${ROUTE_URL}` in a browser, you should see this.
+
+image::fruit-service-postgresql-display-remote-dev-quarkus.png[Fruit Service on PostgreSQL - Quarkus with Remote Dev]
+
+Now go to the editor find `src/main/resources/templates/index.html` and replace this:
+
+[.console-output]
+[source,bash,options="nowrap",subs="attributes+"]
+----
+<h1>CRUD Mission - Quarkus</h1>
+----
+
+With this:
+
+[.console-output]
+[source,bash,options="nowrap",subs="attributes+"]
+----
+<h1>CRUD Mission - Quarkus Remote</h1>
+----
+
+Changes are automatically detected and sent to the remote application. Check the terminal, you should see these new lines:
+
+[.console-output]
+[source,bash,options="nowrap",subs="attributes+"]
+----
+2021-02-10 12:21:45,266 INFO  [io.qua.dep.dev.RuntimeUpdatesProcessor] (Remote dev client thread) File change detected: /Users/cvicensa/Projects/openshift/atarazana/java-inner-loop-dev-guide/apps/quarkus-app/src/main/resources/templates/index.html
+2021-02-10 12:21:45,678 INFO  [io.qua.kub.dep.KubernetesDeployer] (build-17) Only the first deployment target (which is 'openshift') selected via "quarkus.kubernetes.deployment-target" will be deployed
+2021-02-10 12:21:47,092 INFO  [io.qua.dep.QuarkusAugmentor] (Remote dev client thread) Quarkus augmentation completed in 1769ms
+2021-02-10 12:21:47,106 INFO  [io.qua.dep.dev.RuntimeUpdatesProcessor] (Remote dev client thread) Hot replace total time: 1.852s 
+2021-02-10 12:21:48,896 INFO  [io.qua.ver.htt.dep.dev.HttpRemoteDevClient] (Remote dev client thread) Sending dev/app/templates/index.html
+2021-02-10 12:21:48,964 INFO  [io.qua.ver.htt.dep.dev.HttpRemoteDevClient] (Remote dev client thread) Sending quarkus-run.jar
+2021-02-10 12:21:49,006 INFO  [io.qua.ver.htt.dep.dev.HttpRemoteDevClient] (Remote dev client thread) Sending app/atomic-fruit-service-1.0-SNAPSHOT.jar
+2021-02-10 12:21:49,044 INFO  [io.qua.ver.htt.dep.dev.HttpRemoteDevClient] (Remote dev client thread) Sending lib/deployment/build-system.properties
+----
+
+Go back to the UI of our application and refresh change
+
+image::fruit-service-postgresql-display-new-remote-dev-quarkus.png[Fruit Service on PostgreSQL New - Quarkus with Remote Dev]
+
+TIP: Don't forget that whenever you change a file locally the app is rebuilt and relevant elements and uploaded and refreshed
 
 [#binary-deploy]
 == Binary deploy S2I
@@ -255,7 +430,7 @@ Let's package our application with the right profile and build an image with it:
 [.console-input]
 [source,bash,options="nowrap",subs="attributes+"]
 ----
-mvn clean package -DskipTests -Dquarkus.kubernetes.deploy=false -Dquarkus.profile=prod-postgresql
+mvn clean package -DskipTests -Dquarkus.kubernetes.deploy=false -Dquarkus.profile={active_profile}
 ----
 
 After a successful build, let's start the build of the image in OpenShift:

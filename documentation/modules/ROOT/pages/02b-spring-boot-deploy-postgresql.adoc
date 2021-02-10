@@ -80,7 +80,7 @@ You should see this.
 image::fruit-service-postgresql-display.png[Fruit Service on PostgreSQL Topology]
 
 [#run-local-telepresence]
-== Running locally against PostgreSQL with `telepresence`
+== Extending the inner-loop with Telepresence
 
 .Permissions needed
 [IMPORTANT]

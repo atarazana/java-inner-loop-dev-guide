@@ -13,8 +13,9 @@ import org.jboss.logging.Logger;
 import io.quarkus.qute.Template;
 import io.quarkus.qute.TemplateInstance;
 import io.quarkus.runtime.configuration.ProfileManager;
+import io.quarkus.vertx.web.RouteFilter;
 
-@Path("/")
+@Path("/index.html")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class RootResource {
@@ -30,9 +31,8 @@ public class RootResource {
     Template index;
 
     @GET
-    @Produces(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.TEXT_HTML)
     public TemplateInstance get() {
-        logger.info("In get!!!" + dbType);
         return index.data("dbType", dbType).data( "datasourceJdbcUrl", datasourceJdbcUrl).data("profile", ProfileManager.getActiveProfile());
     }
 }

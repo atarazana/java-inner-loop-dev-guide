@@ -387,7 +387,7 @@ You should see this.
 image::fruit-service-oracle-display.png[Fruit Service on Oracle Topology]
 
 [#run-local-telepresence]
-== Running locally against Oracle with `telepresence`
+== Extending the inner-loop with Telepresence
 
 .Permissions needed
 [IMPORTANT]
