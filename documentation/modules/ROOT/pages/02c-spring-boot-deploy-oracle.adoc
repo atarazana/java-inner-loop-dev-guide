@@ -1,5 +1,7 @@
 = Oracle as Database
 include::_attributes.adoc[]
+:database_name: oracle
+:project_name: %USERNAME%-{artifact_id}-{database_name}
 
 This time we're going to install Oracle in a different namespace to make it look as an external database.
 
@@ -234,7 +236,7 @@ In order to run our application, we need a namespace, let's create one:
 [.console-input]
 [source,bash,options="nowrap",subs="attributes+"]
 ----
-export PROJECT_NAME={artifact_id}-oracle-dev
+export PROJECT_NAME={project_name}
 oc new-project $\{PROJECT_NAME}
 ----
 
@@ -458,7 +460,7 @@ Now from another terminal:
 [.console-input]
 [source,bash,options="nowrap",subs="attributes+"]
 ----
-export PROJECT_NAME={artifact_id}-dev
+export PROJECT_NAME={project_name}
 SERVICE_DB_USER=luke SERVICE_DB_PASSWORD=secret SERVICE_DB_NAME=FRUITSDB SERVICE_DB_HOST=oracle-db \
   mvn clean spring-boot:run -Dspring-boot.run.profiles=openshift-oracle -Popenshift-oracle
 ----

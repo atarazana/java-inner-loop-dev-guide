@@ -1,5 +1,7 @@
 = PostgreSQL as Database
 include::_attributes.adoc[]
+:database_name: postgresql
+:project_name: %USERNAME%-{artifact_id}-{database_name}
 
 So before we deploy the code we need a Database right? For the sake of simplicity let's deploy PostgreSQL using some simple commands. Maybe in your real deployment you'd use an external instance, sure, we take that into account in the 
 
@@ -13,7 +15,7 @@ In order to run our application, we need a namespace, let's create one:
 [.console-input]
 [source,bash,options="nowrap",subs="attributes+"]
 ----
-export PROJECT_NAME={artifact_id}-postgresql-dev
+export PROJECT_NAME={project_name}
 oc new-project $\{PROJECT_NAME}
 ----
 
@@ -151,7 +153,7 @@ Now from another terminal:
 [.console-input]
 [source,bash,options="nowrap",subs="attributes+"]
 ----
-export PROJECT_NAME={artifact_id}-dev
+export PROJECT_NAME={project_name}
 SERVICE_DB_USER=luke SERVICE_DB_PASSWORD=secret SERVICE_DB_NAME=FRUITSDB SERVICE_DB_HOST=postgresql-db \
   mvn clean spring-boot:run -Dspring-boot.run.profiles=openshift-postgresql -Popenshift-postgresql
 ----

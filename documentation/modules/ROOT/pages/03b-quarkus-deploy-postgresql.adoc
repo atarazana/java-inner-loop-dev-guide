@@ -1,6 +1,8 @@
 = PostgreSQL as Database
 include::_attributes.adoc[]
-:active_profile: prod-postgresql
+:database_name: postgresql
+:project_name: %USERNAME%-{artifact_id}-{database_name}
+:active_profile: prod-{database_name}
 
 So before we deploy the code we need a Database right? For the sake of simplicity let's deploy PostgreSQL using some simple commands. Maybe in your real deployment you'd use an external instance, sure, we take that into account in the 
 
@@ -14,7 +16,7 @@ In order to run our application, we need a namespace, let's create one:
 [.console-input]
 [source,bash,options="nowrap",subs="attributes+"]
 ----
-export PROJECT_NAME={artifact_id}-postgresql-dev
+export PROJECT_NAME={project_name}
 oc new-project $\{PROJECT_NAME}
 ----
 
@@ -156,7 +158,7 @@ Now let's run our code locally but connected to the database (and/or other consu
 [.console-input]
 [source,bash,options="nowrap",subs="attributes+"]
 ----
-export PROJECT_NAME={artifact_id}-postgresql-dev
+export PROJECT_NAME={project_name}
 DB_USER=luke DB_PASSWORD=secret mvn quarkus:dev -Dquarkus.profile={active_profile}
 ----
 

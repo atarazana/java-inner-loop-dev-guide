@@ -1,6 +1,8 @@
 = Oracle as Database
 include::_attributes.adoc[]
-:active_profile: prod-oracle
+:database_name: oracle
+:project_name: %USERNAME%-{artifact_id}-{database_name}
+:active_profile: prod-{database_name}
 
 This time we're going to install Oracle in a different namespace to make it look as an external database.
 
@@ -259,7 +261,7 @@ In order to run our application, we need a namespace, let's create one:
 [.console-input]
 [source,bash,options="nowrap",subs="attributes+"]
 ----
-export PROJECT_NAME={artifact_id}-oracle-dev
+export PROJECT_NAME={project_name}
 oc new-project $\{PROJECT_NAME}
 ----
 
@@ -347,7 +349,7 @@ You should run these commands in a new terminal so *DON'T FORGET* to run this!
 [.console-input]
 [source,bash,options="nowrap",subs="verbatim,attributes+"]
 ----
-export PROJECT_NAME={artifact_id}-oracle-dev
+export PROJECT_NAME={project_name}
 ----
 
 You'll be asked for `sudo` password, this is normal, telepresence needs to be able to modify networking rules so that you can see Kubernetes Services as local.
@@ -407,7 +409,7 @@ Now let's run our code locally but connected to the database (and/or other consu
 [.console-input]
 [source,bash,options="nowrap",subs="attributes+"]
 ----
-export PROJECT_NAME={artifact_id}-oracle-dev
+export PROJECT_NAME={project_name}
 DB_USER=luke DB_PASSWORD=secret mvn quarkus:dev -Dquarkus.profile={active_profile}
 ----
 
