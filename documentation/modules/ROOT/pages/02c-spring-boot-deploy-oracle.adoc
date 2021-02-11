@@ -307,7 +307,7 @@ Have a look to the expected output.
 [INFO] oc: Using docker image name of namespace: {artifact_id}-dev
 [INFO] oc: Running generator spring-boot
 [INFO] oc: spring-boot: Using Docker image quay.io/jkube/jkube-java-binary-s2i:0.0.9 as base / builder
-[INFO] oc: Using resource templates from /Users/cvicensa/Projects/openshift/atarazana/spring-boot-fruit-service/src/main/jkube
+[INFO] oc: Using resource templates from /Users/cvicensa/Projects/openshift/atarazana/java-inner-loop-dev-guide/src/main/jkube
 [INFO] oc: jkube-healthcheck-spring-boot: Adding readiness probe on port 8080, path='/actuator/health', scheme='HTTP', with initial delay 10 seconds
 [INFO] oc: jkube-healthcheck-spring-boot: Adding liveness probe on port 8080, path='/actuator/health', scheme='HTTP', with initial delay 180 seconds
 [INFO] oc: jkube-service-discovery: Using first mentioned service port '8080' 
@@ -319,7 +319,7 @@ Have a look to the expected output.
 [INFO] oc: Running in OpenShift mode
 [INFO] oc: Running generator spring-boot
 [INFO] oc: spring-boot: Using Docker image quay.io/jkube/jkube-java-binary-s2i:0.0.9 as base / builder
-[INFO] oc: [fruit-service:1.0.0] "spring-boot": Created docker source tar /Users/cvicensa/Projects/openshift/atarazana/spring-boot-fruit-service/target/docker/fruit-service/1.0.0/tmp/docker-build.tar
+[INFO] oc: [fruit-service:1.0.0] "spring-boot": Created docker source tar /Users/cvicensa/Projects/openshift/atarazana/java-inner-loop-dev-guide/target/docker/fruit-service/1.0.0/tmp/docker-build.tar
 [INFO] oc: Creating Secret
 [INFO] oc: Updating BuildServiceConfig fruit-service-s2i for Source strategy
 [INFO] oc: Adding to ImageStream fruit-service
@@ -356,7 +356,7 @@ Have a look to the expected output.
 [INFO] 
 [INFO] 
 [INFO] --- openshift-maven-plugin:1.1.0:deploy (default-cli) @ fruit-service ---
-[INFO] oc: Using OpenShift at https://api.cluster-2036.2036.example.opentlc.com:6443/ in namespace {artifact_id}-dev with manifest /Users/cvicensa/Projects/openshift/atarazana/spring-boot-fruit-service/target/classes/META-INF/jkube/openshift.yml 
+[INFO] oc: Using OpenShift at https://api.cluster-2036.2036.example.opentlc.com:6443/ in namespace {artifact_id}-dev with manifest /Users/cvicensa/Projects/openshift/atarazana/java-inner-loop-dev-guide/target/classes/META-INF/jkube/openshift.yml 
 [INFO] oc: OpenShift platform detected
 [INFO] oc: Using project: {artifact_id}-dev
 [INFO] oc: Creating a Secret from openshift.yml namespace {artifact_id}-dev name fruit-service-postgresql-db

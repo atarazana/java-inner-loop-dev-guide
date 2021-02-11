@@ -3,7 +3,7 @@ runtime:
 
 site:
   title: Java Inner Loop Dev Guide
-  url: https://atarazana.github.io/spring-boot-fruit-service
+  url: https://atarazana.github.io/java-inner-loop-dev-guide
   start_page: java-inner-loop-dev-guide::index.adoc
 
 content:
@@ -19,7 +19,7 @@ asciidoc:
     page-pagination: true
     #title: Java Inner Loop Dev Guide
     git_base: https://github.com/atarazana 
-    git_uri: java-inner-loop-dev-guide  
+    git_uri: java-inner-loop-dev-guide
     git_ref: main
   extensions:
     - ./lib/tab-block.js

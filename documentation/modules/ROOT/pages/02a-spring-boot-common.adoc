@@ -248,7 +248,7 @@ Also the `import.sql` file used => *Executing import script 'file:/Users/nostrom
 [source,bash,subs="attributes+"]
 ----
 ...
-2021-01-28 INFO 59429 --- [  restartedMain] dev.snowdrop.example.ExampleApplication  : Starting ExampleApplication on nostromo with PID 59429 (/Users/nostromo/spring-boot-fruit-service/target/classes started by cvicensa in /Users/nostromo/spring-boot-fruit-service)
+2021-01-28 INFO 59429 --- [  restartedMain] dev.snowdrop.example.ExampleApplication  : Starting ExampleApplication on nostromo with PID 59429 (/Users/nostromo/java-inner-loop-dev-guide/target/classes started by cvicensa in /Users/nostromo/java-inner-loop-dev-guide)
 2021-01-28 INFO 59429 --- [  restartedMain] dev.snowdrop.example.ExampleApplication  : The following profiles are active: local
 ...
 2021-01-28 INFO 59429 --- [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
@@ -262,7 +262,7 @@ Also the `import.sql` file used => *Executing import script 'file:/Users/nostrom
 2021-01-28 INFO 59429 --- [  restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.4.21.Final
 2021-01-28 INFO 59429 --- [  restartedMain] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.0.Final}
 2021-01-28 INFO 59429 --- [  restartedMain] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.H2Dialect
-2021-01-28 INFO 59429 --- [  restartedMain] o.h.t.schema.internal.SchemaCreatorImpl  : HHH000476: Executing import script 'file:/Users/nostromo/spring-boot-fruit-service/target/classes/import-h2.sql'
+2021-01-28 INFO 59429 --- [  restartedMain] o.h.t.schema.internal.SchemaCreatorImpl  : HHH000476: Executing import script 'file:/Users/nostromo/java-inner-loop-dev-guide/target/classes/import-h2.sql'
 2021-01-28 INFO 59429 --- [  restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
 2021-01-28 INFO 59429 --- [  restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
 ...

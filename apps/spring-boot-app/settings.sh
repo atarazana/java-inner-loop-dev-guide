@@ -1,6 +1,6 @@
 #!/bin/sh
 
-export GIT_REPO_URL="https://github.com/atarazana/spring-boot-fruit-service#master"
+export GIT_REPO_URL="https://github.com/atarazana/java-inner-loop-dev-guide#main"
 
 export FRUITS_DATABASE_SERVICE_NAME="my-database"
 export FRUITS_DATABASE_SERVICE_PORT="5432"
