@@ -22,6 +22,6 @@ include::prerequisites-optional.adoc[]
 // [#downloadtutorial]
 // == Get tutorial sources
 // 
-// :tutorial-url: https://github.com/atarazana/spring-boot-fruit-service.git
+// :tutorial-url: https://github.com/atarazana/java-inner-loop-dev-guide.git
 // :folder: my_folder
 // include::https://raw.githubusercontent.com/redhat-developer-demos/rhd-tutorial-common/master/download-sources.adoc[]
