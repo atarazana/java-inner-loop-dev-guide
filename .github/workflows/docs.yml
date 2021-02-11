@@ -3,7 +3,7 @@ name: docs
 on:
   push:
     branches:
-      - ocp-4.6
+      - main
 env:
   SITE_DIR: "gh-pages"
 jobs:
