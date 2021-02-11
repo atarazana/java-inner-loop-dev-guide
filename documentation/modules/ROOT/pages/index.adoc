@@ -8,7 +8,7 @@ include::_attributes.adoc[]
 
 Learn cloud native aware Inner-loop Development Techniques to accelerate the development of Java Applications for OpenShift.
 
-This tutorial provides you with a super-simple CRUD microservice, *`FruitService`*, that implements the usual functions: create, update, delete, find all, etc. mapped to a table in a releational database.
+This tutorial provides you with a super-simple CRUD microservice (in two flavors: Spring Boot and link:https://quarkus.io[Quarkus, window=_blank]), *`FruitService`*, that implements the usual functions: create, update, delete, find all, etc. mapped to a table in a releational database.
 
 No need to code this time, the Java code is simple it works and we have tested it against, H2, PostgreSQL and Oracle RDBMS.
 
