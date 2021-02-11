@@ -6,7 +6,7 @@ include::_attributes.adoc[]
 [.text-center.strong]
 == Accelerate the development of Java Apps on OpenShift
 
-Learn cloud native aware Inner-loop Development Techniques to accelerate the development of Spring Boot CRUD applications for OpenShift.
+Learn cloud native aware Inner-loop Development Techniques to accelerate the development of Java Applications for OpenShift.
 
 This tutorial provides you with a super-simple CRUD microservice, *`FruitService`*, that implements the usual functions: create, update, delete, find all, etc. mapped to a table in a releational database.
 
