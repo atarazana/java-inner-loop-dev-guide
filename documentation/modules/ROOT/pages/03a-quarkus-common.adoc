@@ -1,4 +1,4 @@
-= Quarkus Inner-loop Development
+= Quarkus Inner-loop
 include::_attributes.adoc[]
 
 [#the-code]

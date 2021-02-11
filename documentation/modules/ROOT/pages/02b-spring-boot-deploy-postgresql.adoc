@@ -1,4 +1,4 @@
-= Spring Boot Inner-loop Development Iteration Using PostgreSQL
+= PostgreSQL as Database
 include::_attributes.adoc[]
 
 So before we deploy the code we need a Database right? For the sake of simplicity let's deploy PostgreSQL using some simple commands. Maybe in your real deployment you'd use an external instance, sure, we take that into account in the 

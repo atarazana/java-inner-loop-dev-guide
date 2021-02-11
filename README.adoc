@@ -46,7 +46,7 @@ WARNING: You need credentials in the link:https://container-registry.oracle.com/
 
 Please run these commands as cluster-admin to deploy Oracle DB:
 
-NOTE: You may need to delete/adjust Limit Ranges in `${ORACLE_DB_PROJECT_NAME}` project because the deployment object will request 4Gi.
+NOTE: You may need to delete/adjust Limit Ranges in `$\{ORACLE_DB_PROJECT_NAME}` project because the deployment object will request 4Gi.
 
 NOTE: The OCI image to be downloaded is quite big, to grab a cup of coffee and keep calm.
 
@@ -54,11 +54,11 @@ NOTE: The OCI image to be downloaded is quite big, to grab a cup of coffee and k
 ----
 # Create a project to deploy Oracle DB
 $ export ORACLE_DB_PROJECT_NAME=oracle-db-prj
-$ oc new-project ${ORACLE_DB_PROJECT_NAME}
+$ oc new-project $\{ORACLE_DB_PROJECT_NAME}
 
 # Adjust permissions
-$ oc adm policy add-scc-to-user privileged -z default -n ${ORACLE_DB_PROJECT_NAME} && \
-  oc adm policy add-scc-to-user anyuid -z default -n ${ORACLE_DB_PROJECT_NAME}
+$ oc adm policy add-scc-to-user privileged -z default -n $\{ORACLE_DB_PROJECT_NAME} && \
+  oc adm policy add-scc-to-user anyuid -z default -n $\{ORACLE_DB_PROJECT_NAME}
 
 # Type in your user/email in the Oracle Container Regisry
 $ echo -n "Reg. Email: " && read email
@@ -69,9 +69,9 @@ $ echo -n "Reg. Password: " && read -s password
 # Create a pull secret for the Oracle Container Registry
 $ oc create secret docker-registry oracle-registry \
     --docker-server=container-registry.oracle.com \
-    --docker-username=${email} \
-    --docker-password=${password} \
-    --docker-email=${email} -n ${ORACLE_DB_PROJECT_NAME}
+    --docker-username=$\{email} \
+    --docker-password=$\{password} \
+    --docker-email=$\{email} -n $\{ORACLE_DB_PROJECT_NAME}
 
 # Deploy Oracle DB
 $ oc apply -f ./k8s/oracle-db.yaml
@@ -82,7 +82,7 @@ NOTE: Once the container is running again be calm, after starting the DB daemon 
 To have a look to the logs do this.
 [source,bash,options="nowrap",subs="attributes+"]
 ----
-$ oc project ${ORACLE_DB_PROJECT_NAME}
+$ oc project $\{ORACLE_DB_PROJECT_NAME}
 $ oc logs -f $(oc get pods -o json | jq -r '.items[] | select(.metadata.name | test("oracle-db")).metadata.name')
 ----
 
@@ -171,7 +171,7 @@ So the database has been initialized, now we have to create a user in PDB `ORCLP
 Let's connect to the container and run some commands in order to create the user/schema to hold our data in PDB `ORCLPDB1`:
 [source,bash,options="nowrap",subs="attributes+"]
 ----
-$ oc project ${ORACLE_DB_PROJECT_NAME}
+$ oc project $\{ORACLE_DB_PROJECT_NAME}
 $ oc rsh $(oc get pods -o json | jq -r '.items[] | select(.metadata.name | test("oracle-db")).metadata.name')
 sh-4.2$ 
 ----
@@ -179,7 +179,7 @@ sh-4.2$
 Now that you're connected to the container run this command
 [source,bash,options="nowrap",subs="attributes+"]
 ----
-$ sqlplus system/Kube#2020@localhost:1521/${ORACLE_PDB}
+$ sqlplus system/Kube#2020@localhost:1521/$\{ORACLE_PDB}
 
 SQL*Plus: Release 19.0.0.0.0 - Production on Mon Jan 25 17:10:36 2021
 Version 19.3.0.0.0
@@ -258,7 +258,7 @@ metadata:
  name: oracle-db
 subsets:
  - addresses:
-     - ip: ${ORACLE_DB_SVC_IP}
+     - ip: $\{ORACLE_DB_SVC_IP}
    ports:
      - port: 1521
 EOF

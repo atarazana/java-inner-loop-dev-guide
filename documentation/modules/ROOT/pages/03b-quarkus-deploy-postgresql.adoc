@@ -1,4 +1,4 @@
-= Spring Boot Inner-loop Development Iteration Using PostgreSQL
+= PostgreSQL as Database
 include::_attributes.adoc[]
 :active_profile: prod-postgresql
 
@@ -297,7 +297,7 @@ Now we have to connect to our application running in remote dev mode, we'll do i
 [source,bash,options="nowrap",subs="attributes+"]
 ----
 ./mvnw quarkus:remote-dev \
-  -Dquarkus.live-reload.url=${ROUTE_URL} \
+  -Dquarkus.live-reload.url=$\{ROUTE_URL} \
   -Dquarkus.profile={active_profile}
 ----
 
@@ -343,7 +343,7 @@ image::fruit-service-postgresql-topology-remote-dev-quarkus.png[Fruit Service on
 
 Let's give it a try, shall we?
 
-Open `${ROUTE_URL}` in a browser, you should see this.
+Open `$\{ROUTE_URL}` in a browser, you should see this.
 
 image::fruit-service-postgresql-display-remote-dev-quarkus.png[Fruit Service on PostgreSQL - Quarkus with Remote Dev]
 

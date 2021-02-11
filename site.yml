@@ -8,14 +8,16 @@ site:
 
 content:
   sources:
-    - url: ./
+    - url: git@github.com:atarazana/java-inner-loop-dev-guide.git
+      tags: []
+      branches: [main]
       start_path: documentation
 
 asciidoc:
   attributes:
-    release-version: master
+    release-version: main
     page-pagination: true
-    title: Java Inner Loop Dev Guide
+    #title: Java Inner Loop Dev Guide
     git_base: https://github.com/atarazana 
     git_uri: java-inner-loop-dev-guide  
     git_ref: main

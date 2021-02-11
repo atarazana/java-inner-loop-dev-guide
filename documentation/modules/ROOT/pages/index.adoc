@@ -1,10 +1,10 @@
-= Welcome to Spring Boot CRUD on OpenShift Tutorial
+= Welcome to the Java Inner-Loop Dev Guide
 include::_attributes.adoc[]
 :page-layout: home
 :!sectids:
 
 [.text-center.strong]
-== Accelerate the development of Spring Boot CRUD Apps on OpenShift
+== Accelerate the development of Java Apps on OpenShift
 
 Learn cloud native aware Inner-loop Development Techniques to accelerate the development of Spring Boot CRUD applications for OpenShift.
 

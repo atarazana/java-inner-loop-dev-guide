@@ -13,7 +13,7 @@ content:
       start_path: documentation
 asciidoc:
   attributes:
-    title: Java Inner Loop Dev Guide
+    #title: Java Inner Loop Dev Guide
     git_base: https://github.com/atarazana 
     git_uri: java-inner-loop-dev-guide  
     git_ref: main
